@@ -6,49 +6,48 @@ import java.util.ArrayList;
 /*
  * @author David Walters
  * Product holds all information on price points, descriptors and URL to the product on the company's website.
- * Updated - 09/28/2015
+ * @Updated - 10/25/2015
  * TODO:
  * 	-comments
  */
 public class MF_Product {
 
-	private String name;
-	private String description;
-	private String UPC;
-	private String UNSPSC;
-	private String company;
-	private URL linkToProduct;
-	private ArrayList<MF_Price> prices;
-	private double height;
-	private double width;
-	private double length;
-	private double weight;
+	private String 					name;
+	private String 					description;
+	private String 					UPC;
+	private String 					UNSPSC;
+	private URL 					linkToProduct;
+	private ArrayList<MF_Price> 	prices;
+	private double 					height;
+	private double 					width;
+	private double 					length;
+	private double 					weight;
 
 	public MF_Product() {
-		this.name = null;
-		this.description = null;
-		this.UPC = null;
-		this.UNSPSC = null;
-		this.linkToProduct = null;
-		this.prices = null;
-		this.height = 0.0f;
-		this.width = 0.0f;
-		this.length = 0.0f;
-		this.weight = 0.0f;
+		this.name	 		= null;
+		this.description 	= null;
+		this.UPC 			= null;
+		this.UNSPSC 		= null;
+		this.linkToProduct 	= null;
+		this.prices 		= null;
+		this.height 		= 0.0f;
+		this.width 			= 0.0f;
+		this.length 		= 0.0f;
+		this.weight 		= 0.0f;
 	}
 
-	public MF_Product(String name, String description, String UPC, String UNSPSC, String company, URL linkToProduct,
+	public MF_Product(String name, String description, String UPC, String UNSPSC, URL linkToProduct,
 			ArrayList<MF_Price> prices, double height, double width, double length, double weight) {
-		this.name = name;
-		this.description = description;
-		this.UPC = UPC;
-		this.UNSPSC = UNSPSC;
-		this.linkToProduct = linkToProduct;
-		this.prices = prices;
-		this.height = height;
-		this.width = width;
-		this.length = length;
-		this.weight = weight;
+		this.name 			= name;
+		this.description 	= description;
+		this.UPC 			= UPC;
+		this.UNSPSC 		= UNSPSC;
+		this.linkToProduct 	= linkToProduct;
+		this.prices 		= prices;
+		this.height 		= height;
+		this.width 			= width;
+		this.length 		= length;
+		this.weight 		= weight;
 	}
 
 	public String getName() {
@@ -81,14 +80,6 @@ public class MF_Product {
 
 	public void setUNSPSC(String uNSPSC) {
 		UNSPSC = uNSPSC;
-	}
-
-	public String getCompany() {
-		return company;
-	}
-
-	public void setCompany(String company) {
-		this.company = company;
 	}
 
 	public URL getLinkToProduct() {
@@ -184,6 +175,29 @@ public class MF_Product {
 			}
 		}
 		return false;
+	}
+	
+	/**
+	 * Prints a stream with the variabes from this class. Primarily used for development and testing.
+	 */
+	public void print() {
+		System.out.println ("Name: " + this.name);
+		System.out.println ("Description: " + this.description);
+		System.out.println ("UPC: " + this.UPC);
+		System.out.println ("UNSPSC: " + this.UNSPSC);
+		System.out.println ("Company: " + this.description);
+		System.out.println ("URL: " + this.linkToProduct.toExternalForm());
+		System.out.println ("Height: " + this.height);
+		System.out.println ("Width: " + this.width);
+		System.out.println ("Length: " + this.length);
+		System.out.println ("Weight: " + this.weight);
+		System.out.println ("-----------------------------");
+		System.out.println ("------------PRICES-----------");
+		System.out.println ("-----------------------------");
+		for (int i = 0; i < prices.size(); i++) {
+			System.out.println ("Date: " + prices.get(i).getDate().toString());
+			System.out.println ("Price: " + prices.get(i).getPrice());
+		}
 	}
 
 }
