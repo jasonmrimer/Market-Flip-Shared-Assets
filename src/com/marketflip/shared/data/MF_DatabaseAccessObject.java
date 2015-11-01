@@ -19,7 +19,7 @@ import com.marketflip.shared.products.MF_Product;
  * @author David Walters
  * The library to access the products CloudSQL instance using google's Cloud SQL API.
  * SINGLETON class- not meant to be instantiated more than once to prevent overflow/multiple connections open at once.
- * Updated - 10/25/2015
+ * Updated - 11/1/2015
  * 
  */
 

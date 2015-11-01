@@ -7,7 +7,7 @@ import com.marketflip.shared.products.*;
 /**
  * Test application to test the DAO during development.
  * @author David Walters
- * @updated 10/25/2015
+ * @updated 11/1/2015
  */
 public class TestApp {
 

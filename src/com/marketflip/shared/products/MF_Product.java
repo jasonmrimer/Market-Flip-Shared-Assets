@@ -6,7 +6,7 @@ import java.util.ArrayList;
 /*
  * @author David Walters
  * Product holds all information on price points, descriptors and URL to the product on the company's website.
- * @Updated - 10/25/2015
+ * @Updated - 11/1/2015
  * TODO:
  * 	-comments
  */
