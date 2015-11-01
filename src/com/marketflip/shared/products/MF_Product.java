@@ -12,6 +12,7 @@ import java.util.ArrayList;
  */
 public class MF_Product {
 
+	private String					company;
 	private String 					name;
 	private String 					description;
 	private String 					UPC;
@@ -49,7 +50,15 @@ public class MF_Product {
 		this.length 		= length;
 		this.weight 		= weight;
 	}
-
+	
+	public String getCompany() {
+		return company;
+	}
+	
+	public void setCompany(String company) {
+		this.company = company;
+	}
+	
 	public String getName() {
 		return name;
 	}
@@ -181,6 +190,7 @@ public class MF_Product {
 	 * Prints a stream with the variabes from this class. Primarily used for development and testing.
 	 */
 	public void print() {
+		System.out.println ("Company: " + this.company);
 		System.out.println ("Name: " + this.name);
 		System.out.println ("Description: " + this.description);
 		System.out.println ("UPC: " + this.UPC);

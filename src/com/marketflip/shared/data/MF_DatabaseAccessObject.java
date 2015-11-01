@@ -119,8 +119,7 @@ public class MF_DatabaseAccessObject {
 		} else if (!EAN13CheckDigit.EAN13_CHECK_DIGIT.isValid(upc)){
 			System.err.println("ERROR: UPC cannot be resolved as EAN/ISBN-13/UPC compliant.");
 			return new MF_Product();
-		}
-		else if (!(productSet.contains(upc))) {
+		} else if (!(productSet.contains(upc))) {
 			System.err.println("ERROR: Product does not exist in database");
 			return new MF_Product();
 		}
