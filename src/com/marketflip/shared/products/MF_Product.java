@@ -185,7 +185,6 @@ public class MF_Product {
 		System.out.println ("Description: " + this.description);
 		System.out.println ("UPC: " + this.UPC);
 		System.out.println ("UNSPSC: " + this.UNSPSC);
-		System.out.println ("Company: " + this.description);
 		System.out.println ("URL: " + this.linkToProduct.toExternalForm());
 		System.out.println ("Height: " + this.height);
 		System.out.println ("Width: " + this.width);
@@ -197,6 +196,7 @@ public class MF_Product {
 		for (int i = 0; i < prices.size(); i++) {
 			System.out.println ("Date: " + prices.get(i).getDate().toString());
 			System.out.println ("Price: " + prices.get(i).getPrice());
+			System.out.println ("Company ID: " + prices.get(i).getCompany());
 		}
 	}
 
