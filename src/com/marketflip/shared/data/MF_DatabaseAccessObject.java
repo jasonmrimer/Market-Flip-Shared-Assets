@@ -5,9 +5,12 @@ import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.ResultSet;
 import java.sql.ResultSetMetaData;
+import java.sql.SQLException;
 import java.sql.Statement;
-import java.util.ArrayList;
+import java.sql.PreparedStatement;
 import java.util.Date;
+
+import java.util.ArrayList;
 import java.util.HashSet;
 
 import org.apache.commons.validator.routines.checkdigit.EAN13CheckDigit;
@@ -19,7 +22,7 @@ import com.marketflip.shared.products.MF_Product;
  * @author David Walters
  * The library to access the products CloudSQL instance using google's Cloud SQL API.
  * SINGLETON class- not meant to be instantiated more than once to prevent overflow/multiple connections open at once.
- * Updated - 11/1/2015
+ * Updated - 11/8/2015
  * 
  */
 
@@ -89,8 +92,9 @@ public class MF_DatabaseAccessObject {
 			
 			DriverManager.registerDriver(new com.mysql.jdbc.Driver());
 			Class.forName("com.mysql.jdbc.Driver");
-			//connection = DriverManager.getConnection(URL);
 			connection = DriverManager.getConnection(URL, USERNAME, PASSWORD);
+			
+			connection.setAutoCommit(false);
 			
 			sql = "SELECT UPC FROM PRODUCTS";
 			sqlStatement = connection.createStatement();
@@ -108,7 +112,152 @@ public class MF_DatabaseAccessObject {
 		}
 	}
 	
-	public MF_Product getProductByUPC (String upc) {
+	public boolean insertProduct (MF_Product product) throws SQLException {
+		
+		if (MF_DatabaseAccessObject.MF_DAO == null) {
+			System.err.println("ERROR: Connection has not been created.");
+			return false;
+		} else if (product.getUPC() == null) {
+			System.err.println("ERROR: UPC cannot be null.");
+			return false;
+		} else if (!EAN13CheckDigit.EAN13_CHECK_DIGIT.isValid(product.getUPC())){
+			System.err.println("ERROR: UPC cannot be resolved as EAN/ISBN-13/UPC compliant.");
+			return false;
+		} else if (productSet.contains(product.getUPC())) {
+			System.err.println("ERROR: Product already exists in database");
+			return false;
+		}
+		
+		try {
+			
+			String				sql_create_info_table;
+			String				sql_create_price_table;
+			String				sql_insert_info;
+			String				sql_insert_price;
+			String				sql_insert_product;
+			
+			Statement			create_info_table;
+			Statement			create_price_table;
+			Statement			insert_product_statement;
+			PreparedStatement	insert_info_statement;
+			PreparedStatement	insert_price_statement;
+			
+			String 				upc				= product.getUPC();
+			String 				name			= product.getName();
+			String 				UNSPSC			= product.getUNSPSC();
+			String 				description		= product.getDescription();
+			//This is broken at the moment. Logged in Asana.
+			//String				company			= product.getCompany();
+			//Developing with company 1 (Walmart)
+			String	company = "1";
+			double 				height			= product.getHeight();
+			double 				width			= product.getWidth();
+			double 				length			= product.getLength();
+			double 				weight			= product.getWeight();
+			URL					linkToProduct	= product.getLinkToProduct();
+			ArrayList<MF_Price> priceList		= product.getPrices();
+			double 				lowestPrice 	= 0.0;
+			
+			
+			// Prepare statements.
+			sql_create_info_table	 =		"CREATE TABLE UPC_" + upc + "_INFO ("
+										+	" COMPANY			int(11)			NOT NULL, "
+										+	" UPC				varchar(45)		NOT NULL,"
+										+ 	" NAME				varchar(100)	DEFAULT NULL,"
+										+ 	" HEIGHT			varchar(15)		DEFAULT NULL,"
+										+	" WIDTH				varchar(15)		DEFAULT	NULL,"
+										+ 	" LENGTH			varchar(15)		DEFAULT NULL,"
+										+ 	" DESCRIPTION		varchar(300)	DEFAULT NULL,"
+										+	" URL				varchar(300)	DEFAULT NULL,"
+										+	" CURRENT_PRICE		varchar(45)		DEFAULT NULL,"
+										+	" KEY UPC_FK_idx		(UPC),"
+										+ 	" KEY COMPANY_FK_idx	(COMPANY),"
+										+ 	" CONSTRAINT COMPANY_FK_" + upc + " FOREIGN KEY (COMPANY) REFERENCES COMPANIES"
+										+ 	" (COMPANY_ID) ON DELETE NO ACTION ON UPDATE NO ACTION,"
+										+	" CONSTRAINT UPC_FK_" + upc + " FOREIGN KEY (UPC) REFERENCES PRODUCTS(UPC)"
+										+	" ON DELETE NO ACTION ON UPDATE NO ACTION ); ";
+			
+			sql_create_price_table	=		"CREATE TABLE UPC_" + upc + "_PRICE ("
+										+	" DATE 						datetime 	NOT NULL DEFAULT CURRENT_TIMESTAMP,"
+										+	" COMPANY_" + company + " 	double 		DEFAULT NULL,"
+										+	" UNIQUE KEY DATE_UNIQUE_" + upc + " (DATE) ); ";
+					
+			sql_insert_product =			"INSERT INTO PRODUCTS.PRODUCTS "
+										+ 	" (UPC, DEPRECATED) "
+										+ 	" VALUES (" + upc + ", 0);";
+			
+			sql_insert_info =				"INSERT INTO PRODUCTS.UPC_" + upc + "_INFO "
+										+	" (COMPANY, UPC, NAME, HEIGHT, WIDTH, LENGTH, DESCRIPTION, URL, CURRENT_PRICE) "
+										+	"VALUES (?,?,?,?,?,?,?,?,?); ";
+			
+			sql_insert_price =				"INSERT INTO PRODUCTS.UPC_" + upc + "_PRICE "
+										+	" (DATE, COMPANY_" + company + ") "
+										+	" VALUES (?,?);";
+					
+			// Concat all statements into one statement and prepare it.
+//			sql_statement = (sql_create_info_table + sql_create_price_table + sql_insert_info + sql_insert_price);
+//			insert_statement = connection.prepareStatement(sql_statement);
+			
+			create_price_table 		= connection.createStatement();
+			create_info_table 		= connection.createStatement();
+			insert_product_statement= connection.createStatement();
+			insert_price_statement	= connection.prepareStatement(sql_insert_price);
+			insert_info_statement	= connection.prepareStatement(sql_insert_info);
+			
+			
+			
+			//Find the lowest price from all of the prices listed and set price batches.
+			for (MF_Price price : priceList){
+				if (price.getPrice() < lowestPrice) {
+					lowestPrice = price.getPrice();
+				}
+				
+				java.sql.Date convertedDate = dateToSQLDate(price.getDate());
+				insert_price_statement.setDate(1, convertedDate);
+				insert_price_statement.setDouble(2, price.getPrice());
+				insert_price_statement.addBatch();
+			}
+
+			// Set the values for the info table.
+			insert_info_statement.setString(1, company);
+			insert_info_statement.setString(2, upc);
+			insert_info_statement.setString(3, name);
+			insert_info_statement.setDouble(4, height);
+			insert_info_statement.setDouble(5, width);
+			insert_info_statement.setDouble(6, length);
+			insert_info_statement.setString(7, description);
+			insert_info_statement.setString(8, linkToProduct.toExternalForm());
+			insert_info_statement.setDouble(9, lowestPrice);		
+			
+			// Execute statements.
+			create_info_table.executeUpdate(sql_create_info_table);
+			create_price_table.executeUpdate(sql_create_price_table);
+			insert_product_statement.executeUpdate(sql_insert_product);
+			insert_info_statement.executeUpdate();
+			insert_price_statement.executeBatch();
+			
+			// Close the statements.
+			create_info_table.close();
+			create_price_table.close();
+			insert_product_statement.close();
+			insert_info_statement.close();
+			insert_price_statement.close();
+
+			connection.commit();
+			productSet.add(upc);
+			return true;
+			
+			
+		} catch (Exception e) {
+			System.err.println("ERROR: Failed to insert new product: ");
+			e.printStackTrace();
+			connection.rollback();
+			return false;
+		}
+		
+	}
+	
+	public MF_Product getProductByUPC (String upc) throws SQLException {
 		
 		if (MF_DatabaseAccessObject.MF_DAO == null) {
 			System.err.println("ERROR: Connection has not been created.");
@@ -186,8 +335,9 @@ public class MF_DatabaseAccessObject {
 			
 			String companyColumnLabel;
 			while (product_price_results.next()) {
-				//date = product_info_results.getDate(PRICE_DATE_INDEX);  //TODO: This line is not working at the moment, therefore we use the current date. Fix!!!!!!
 				date = new Date();
+				
+				//date = product_info_results.getDate(PRICE_DATE_INDEX);
 				
 				for (String company : companiesList) {
 					companyColumnLabel = "COMPANY_".concat(company);
@@ -201,10 +351,13 @@ public class MF_DatabaseAccessObject {
 			product = new MF_Product (name, description, upc_result, UNSPSC, linkToProduct, priceList, height, width, length, weight);
 			info_statement.close();
 			price_statement.close();
+			
+			connection.commit();
 			return product;
 		} catch (Exception e) {
 			System.err.println("ERROR: Unabe to retrieve from database instance.");
 			e.printStackTrace();
+			connection.rollback();
 			return new MF_Product();
 		}	
 		
@@ -217,5 +370,9 @@ public class MF_DatabaseAccessObject {
 	 */
 	public boolean productExists (String UPC) {
 		return (productSet.contains(UPC));
+	}
+	
+	private java.sql.Date dateToSQLDate(java.util.Date date) {
+	    return new java.sql.Date(date.getTime());
 	}
 }

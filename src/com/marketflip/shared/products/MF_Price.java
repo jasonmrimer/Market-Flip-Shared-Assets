@@ -23,7 +23,7 @@ public class MF_Price {
 	 */
 	public MF_Price() {
 		this.price = 0.00;
-		this.date = Calendar.getInstance().getTime();
+		this.date = (Date) Calendar.getInstance().getTime();
 		this.company = null;
 	}
 
