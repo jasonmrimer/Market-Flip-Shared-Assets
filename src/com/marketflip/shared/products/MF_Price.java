@@ -1,5 +1,6 @@
 package com.marketflip.shared.products;
 
+import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
@@ -113,23 +114,18 @@ public class MF_Price {
 	
 	
 	/**
-	 * Set the date associated with the price from java.util..date using 
-	 * a string that is formatted in the following format: EEEEE MMMMM yyyy HH:mm:ss
-	 * example: Monday 01 January 2015 22:43:30
-	 * @param date The string to be parsed to a date.
+	 * Set the date object associated with the price using an epoch timestamp.
+	 * 
+	 * @param long date
+	 * 	Time in millisecons since the epoch
 	 */
-	public void setDate(String date) {
-		try {
-			String pattern = "EEEEE dd MMMMM yyyy HH:mm:ss";
-			SimpleDateFormat format = new SimpleDateFormat(pattern);
-			this.date = format.parse(date);
-		} 
-		catch (ParseException e) {
-			//TODO: Handle error. 
-			System.out.println ("This error isn't handled YET!");
-			e.printStackTrace();
-		}
+	public void setDate(long date) {
+		this.date = new Date(date);
 	}
+	
+	/**
+	 * Set the date associated with the price from java.util.date
+	 */
 	
 	/**
 	 * Returns the name of the company where the price was found.

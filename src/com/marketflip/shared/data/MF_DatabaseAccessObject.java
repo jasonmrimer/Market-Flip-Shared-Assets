@@ -156,7 +156,8 @@ public class MF_DatabaseAccessObject {
 			double 				weight			= product.getWeight();
 			URL					linkToProduct	= product.getLinkToProduct();
 			ArrayList<MF_Price> priceList		= product.getPrices();
-			double 				lowestPrice 	= 0.0;
+			double 				lowestPrice 	= product.getCurrentLowestPrice().getPrice();
+			
 			
 			
 			// Prepare statements.
@@ -208,15 +209,13 @@ public class MF_DatabaseAccessObject {
 			
 			//Find the lowest price from all of the prices listed and set price batches.
 			for (MF_Price price : priceList){
-				if (price.getPrice() < lowestPrice) {
-					lowestPrice = price.getPrice();
-				}
 				
 				java.sql.Date convertedDate = dateToSQLDate(price.getDate());
 				insert_price_statement.setDate(1, convertedDate);
 				insert_price_statement.setDouble(2, price.getPrice());
 				insert_price_statement.addBatch();
 			}
+			
 
 			// Set the values for the info table.
 			insert_info_statement.setString(1, company);

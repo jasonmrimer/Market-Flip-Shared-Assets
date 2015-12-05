@@ -2,6 +2,8 @@ package com.marketflip.shared.products;
 
 import java.net.URL;
 import java.util.ArrayList;
+import java.util.Date;
+import java.util.HashMap;
 
 /*
  * @author David Walters
@@ -137,6 +139,40 @@ public class MF_Product {
 
 	public void setWeight(double weight) {
 		this.weight = weight;
+	}
+	
+	public MF_Price getCurrentLowestPrice() {
+		
+		MF_Price lowestPrice = new MF_Price();
+		lowestPrice.setPrice(99999999.99);
+		HashMap<String, MF_Price> companyPriceMap = new HashMap();
+		ArrayList<String> companyKeys = new ArrayList();
+		
+		for (int i = 0; i < prices.size(); i++) {
+			
+			double price = prices.get(i).getPrice();
+			String company = prices.get(i).getCompany();
+			Date date = prices.get(i).getDate();
+			
+			if (companyPriceMap.containsKey(company)){
+				if (date.getTime() > companyPriceMap.get(company).getDate().getTime()) {
+					companyPriceMap.put(company, new MF_Price(price, date, company));
+				}
+			} else {
+				companyPriceMap.put(company, new MF_Price(price, date, company));
+				companyKeys.add(company);
+			}
+		}
+		
+		for (int i = 0; i < companyKeys.size(); i++) {
+			String company = companyKeys.get(i);
+			if (companyPriceMap.get(company).getPrice() < lowestPrice.getPrice()){
+				lowestPrice = companyPriceMap.get(company);
+			}
+		}
+		
+		return lowestPrice;
+				
 	}
 
 	/**
