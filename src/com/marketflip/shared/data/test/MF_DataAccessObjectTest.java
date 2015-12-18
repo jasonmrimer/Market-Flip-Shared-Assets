@@ -14,7 +14,6 @@ import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import com.marketflip.shared.data.*;
-import com.marketflip.shared.data.exceptions.ProductValidationException;
 import com.marketflip.shared.products.*;
 
 
@@ -78,11 +77,9 @@ public class MF_DataAccessObjectTest {
 	
 	@Test
 	public void Insert_NullUPC_ExpectFalse () {
-		
 		String upc = null;
 		MF_Product product = new MF_Product(upc);
-		assertFalse(MF_DataAccessObject.getDAO().insertProduct(product));	
-		
+		assertFalse(MF_DataAccessObject.getDAO().insertProduct(product));			
 	}
 	
 	

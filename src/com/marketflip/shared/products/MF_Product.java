@@ -38,6 +38,19 @@ public class MF_Product {
 		this.length 		= 0.0f;
 		this.weight 		= 0.0f;
 	}
+	
+	public MF_Product(String upc) {
+		this.name	 		= null;
+		this.description 	= null;
+		this.UPC 			= upc;
+		this.UNSPSC 		= null;
+		this.linkToProduct 	= null;
+		this.prices 		= null;
+		this.height 		= 0.0f;
+		this.width 			= 0.0f;
+		this.length 		= 0.0f;
+		this.weight 		= 0.0f;
+	}
 
 	public MF_Product(String name, String description, String UPC, String UNSPSC, URL linkToProduct,
 			ArrayList<MF_Price> prices, double height, double width, double length, double weight) {

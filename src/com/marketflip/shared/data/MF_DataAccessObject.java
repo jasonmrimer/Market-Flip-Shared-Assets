@@ -6,8 +6,8 @@ import java.sql.ResultSet;
 import java.sql.Statement;
 import java.util.HashSet;
 
-import com.marketflip.shared.data.exceptions.ProductValidationException;
 import com.marketflip.shared.products.MF_Product;
+import com.marketflip.shared.products.util.MF_ProductValidator;
 
 public class MF_DataAccessObject {
 	
@@ -99,26 +99,10 @@ public class MF_DataAccessObject {
 	 */
 	public boolean insertProduct(MF_Product product) {
 		
-		try {
-			validateProduct(product);
-		} catch (ProductValidationException e) {
-			System.err.println("ERROR: Product not inserted.");
-			e.printStackTrace();
+		if (!MF_ProductValidator.validate().Product(product)) {
 			return false;
 		}
-		
 		return true;
-		
-	}
-	
-	private void validateProduct (MF_Product product) throws ProductValidationException {
-		
-		if (product == null) {
-			throw new ProductValidationException("Product cannot be null.");
-		}
-		if (product.getUPC() == "" || product.getUPC() == null) {
-			throw new ProductValidationException("UPC cannot be null.");
-		}
 		
 	}
 
