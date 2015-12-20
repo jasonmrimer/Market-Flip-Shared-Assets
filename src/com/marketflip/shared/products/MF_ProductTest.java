@@ -41,7 +41,7 @@ public class MF_ProductTest {
 		
 		MF_Price truePrice = new MF_Price(0.99, new Date((long)1449275197 * 1000), "Amazon");
 		
-		ArrayList<MF_Price> testPrices = new ArrayList();
+		ArrayList<MF_Price> testPrices =  new ArrayList();
 		testPrices.add(new MF_Price(1.99, new Date((long)1441270800 * 1000), "Amazon"));
 		testPrices.add(new MF_Price(1.98, new Date((long)605272271 * 1000), "Walmart"));
 		testPrices.add(new MF_Price(1.96, new Date((long)1426852883 * 1000), "Amazon"));

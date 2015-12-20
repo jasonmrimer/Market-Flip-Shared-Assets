@@ -54,7 +54,6 @@ public class MF_DataAccessObject {
 			Statement 	sqlStatement;
 			ResultSet	rs;
 			
-			
 			DriverManager.registerDriver(new com.mysql.jdbc.Driver());
 			Class.forName("com.mysql.jdbc.Driver");
 			connection = DriverManager.getConnection(URL, USERNAME, PASSWORD);
