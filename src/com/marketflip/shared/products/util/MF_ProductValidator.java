@@ -7,14 +7,14 @@ import com.marketflip.shared.products.MF_Product;
 /**
  * Singleton utility class to validate various MF_Product properties, or an entire MF_Product
  * @author David Walters
- * Last Updated: 12/18/2015
+ * Last Updated: 12/20/2015
  */
 public class MF_ProductValidator {
 	
 	private static final MF_ProductValidator validator = new MF_ProductValidator();
 	
 	/**
-	 * Returns a validator.
+	 * Returns a product validator.
 	 * @return ProductValidator.
 	 */
 	public static MF_ProductValidator validate () {
@@ -32,6 +32,7 @@ public class MF_ProductValidator {
 	 * 		Returns true if the UPC is validated.
 	 */
 	public boolean UPC(String UPC) {
+	
 		if (EAN13CheckDigit.EAN13_CHECK_DIGIT.isValid(UPC)){
 			return true;
 		} else {
@@ -39,6 +40,7 @@ public class MF_ProductValidator {
 			return false;
 		}
 	}
+	
 	
 	/**
 	 * Validates an MF_Product based on it's properties and business logic of Market Flip.
@@ -49,14 +51,20 @@ public class MF_ProductValidator {
 	 */
 	public boolean Product(MF_Product product){
 		
-		if (!MF_ProductValidator.validate().UPC(product.getUPC())){
-			System.err.println("ERROR: UPC is not valid.");
-			return false;
+		boolean valid = true;
+		
+		if (product != null){
+			// Add all checks in here.
+			if (!MF_ProductValidator.validate().UPC(product.getUPC())){
+				valid = false;
+			}
+		} else {
+			System.err.println("ERROR: Product cannot be null.");
+			valid = false;
 		}
 		
 		//TODO: Needs to be expanded significantly as the business logic is discussed.
-		
-		return true;
+		return valid;
 	}
 
 }

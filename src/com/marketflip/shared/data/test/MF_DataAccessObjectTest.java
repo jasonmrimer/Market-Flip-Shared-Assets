@@ -8,6 +8,8 @@ package com.marketflip.shared.data.test;
  */
 import static org.junit.Assert.*;
 
+import java.sql.SQLException;
+
 import org.junit.After;
 import org.junit.AfterClass;
 import org.junit.Before;
@@ -68,15 +70,13 @@ public class MF_DataAccessObjectTest {
 	}
 	
 	@Test
-	public void Insert_NullProduct_ExpectFalse () {
-		
+	public void Insert_NullProduct_ExpectFalse () throws SQLException {
 		MF_Product product = null;
-		assertFalse(MF_DataAccessObject.getDAO().insertProduct(product));	
-		
+		assertFalse(MF_DataAccessObject.getDAO().insertProduct(product));
 	}
 	
 	@Test
-	public void Insert_NullUPC_ExpectFalse () {
+	public void Insert_NullUPC_ExpectFalse () throws SQLException {
 		String upc = null;
 		MF_Product product = new MF_Product(upc);
 		assertFalse(MF_DataAccessObject.getDAO().insertProduct(product));			
