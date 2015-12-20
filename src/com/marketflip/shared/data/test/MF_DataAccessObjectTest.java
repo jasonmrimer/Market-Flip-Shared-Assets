@@ -6,15 +6,20 @@ package com.marketflip.shared.data.test;
  * @author David Walters
  * Last updated 12/13/2015
  */
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
+
+import java.util.ArrayList;
 
 import org.junit.After;
 import org.junit.AfterClass;
 import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
-import com.marketflip.shared.data.*;
-import com.marketflip.shared.products.*;
+
+import com.marketflip.shared.data.MF_DataAccessObject;
+import com.marketflip.shared.products.MF_Price;
+import com.marketflip.shared.products.MF_Product;
 
 
 
@@ -67,20 +72,78 @@ public class MF_DataAccessObjectTest {
 		assertTrue(MF_DataAccessObject.getDAO() == null);
 	}
 	
+//  @Deprecated
+//	@Test
+//	public void Insert_NullProduct_ExpectFalse () throws SQLException {
+//		MF_Product product = null;
+//		assertFalse(MF_DataAccessObject.getDAO().insertProduct(product));
+//	}
+//	
+//	@Test
+//	public void Insert_NullUPC_ExpectFalse () throws SQLException {
+//		String upc = null;
+//		MF_Product product = new MF_Product(upc);
+//		assertFalse(MF_DataAccessObject.getDAO().insertProduct(product));			
+//	}
+	
 	@Test
-	public void Insert_NullProduct_ExpectFalse () {
-		
+	public void AddProductToCommit_SendingNull_ExpectFalse () {
 		MF_Product product = null;
-		assertFalse(MF_DataAccessObject.getDAO().insertProduct(product));	
+		assertFalse(MF_DataAccessObject.getDAO().addProductToCommit(product));
+	}
+	
+	@Test
+	public void AddProductToCommit_SendingValidProduct_ExpectTrue() {
+		
+		String UPC = "889661008491";
+		
+		ArrayList<MF_Price> priceList = new ArrayList<MF_Price>();
+		MF_Price price = new MF_Price(26.33, "Amazon");
+		priceList.add(price);
+		
+		MF_Product product = new MF_Product(UPC, priceList);
+		assertFalse(MF_DataAccessObject.getDAO().addProductToCommit(product));
+	}
+	
+	@Test
+	public void AddProductToCommit_SendingValidProduct_ExpectInArrayList () {
+		String UPC = "889661008491";
+		
+		ArrayList<MF_Price> priceList = new ArrayList<MF_Price>();
+		MF_Price price = new MF_Price(26.33, "Amazon");
+		priceList.add(price);
+		
+		MF_Product product = new MF_Product(UPC, priceList);
+		
+		MF_DataAccessObject.getDAO().addProductToCommit(product);
+		assertTrue(MF_DataAccessObject.getDAO().getCommitList().contains(product));
 		
 	}
 	
 	@Test
-	public void Insert_NullUPC_ExpectFalse () {
-		String upc = null;
-		MF_Product product = new MF_Product(upc);
-		assertFalse(MF_DataAccessObject.getDAO().insertProduct(product));			
+	public void AddProductToCommit_SendingInvalidProduct_ExpectFalse() {
+		String UPC = "xcvxcv";
+
+		ArrayList<MF_Price> priceList = new ArrayList<MF_Price>();
+		MF_Price price = new MF_Price(26.33, "Amazon");
+		priceList.add(price);
+		
+		MF_Product product = new MF_Product(UPC, priceList);
+		assertFalse(MF_DataAccessObject.getDAO().addProductToCommit(product));
 	}
 	
-	
+	@Test
+	public void AddProductToCommit_SendingInvalidProduct_ExpectNotInArrayList() {
+		String UPC = "xcvxcv";
+
+		ArrayList<MF_Price> priceList = new ArrayList<MF_Price>();
+		MF_Price price = new MF_Price(26.33, "Amazon");
+		priceList.add(price);
+		
+		MF_Product product = new MF_Product(UPC, priceList);
+		MF_DataAccessObject.getDAO().addProductToCommit(product);
+		
+		assertFalse(MF_DataAccessObject.getDAO().getCommitList().contains(product));
+	}
+
 }

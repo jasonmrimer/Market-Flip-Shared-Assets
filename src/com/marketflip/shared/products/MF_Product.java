@@ -66,6 +66,11 @@ public class MF_Product {
 		this.weight 		= weight;
 	}
 	
+	public MF_Product(String UPC, ArrayList<MF_Price> priceList) {
+		this.UPC = UPC;
+		this.prices = priceList;
+	}
+	
 	public String getCompany() {
 		return company;
 	}

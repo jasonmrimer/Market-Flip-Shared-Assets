@@ -55,10 +55,7 @@ public class MF_ProductTest {
 		
 		MF_Price testPrice = testProduct.getCurrentLowestPrice();
 		
-		System.out.println(testPrice.getDate());
-		System.out.println(truePrice.getDate());
-		
-		assertTrue(testPrice.getCompany() == truePrice.getCompany());
+		assertEquals(testPrice.getCompany(), truePrice.getCompany());
 		assertTrue(testPrice.getDate().getTime() == truePrice.getDate().getTime());
 		assertTrue(testPrice.getPrice() == truePrice.getPrice());	
 	}
