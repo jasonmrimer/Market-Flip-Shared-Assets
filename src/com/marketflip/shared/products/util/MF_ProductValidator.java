@@ -7,7 +7,7 @@ import com.marketflip.shared.products.MF_Product;
 /**
  * Singleton utility class to validate various MF_Product properties, or an entire MF_Product
  * @author David Walters
- * Last Updated: 12/20/2015
+ * Last Updated: 12/21/2015
  */
 public class MF_ProductValidator {
 	
@@ -56,6 +56,9 @@ public class MF_ProductValidator {
 		if (product != null){
 			// Add all checks in here.
 			if (!MF_ProductValidator.validate().UPC(product.getUPC())){
+				valid = false;
+			}
+			if (product.getPrices() == null || product.getPrices().isEmpty()) {
 				valid = false;
 			}
 			

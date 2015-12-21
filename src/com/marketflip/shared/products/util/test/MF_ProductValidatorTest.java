@@ -8,12 +8,15 @@ package com.marketflip.shared.products.util.test;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
+import java.util.ArrayList;
+
 import org.junit.After;
 import org.junit.AfterClass;
 import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
+import com.marketflip.shared.products.MF_Price;
 import com.marketflip.shared.products.MF_Product;
 import com.marketflip.shared.products.util.MF_ProductValidator;
 
@@ -59,13 +62,14 @@ public class MF_ProductValidatorTest {
 		MF_Product product = new MF_Product(UPC);
 		assertFalse(MF_ProductValidator.validate().Product(product));
 	}
-	
-	@Test
-	public void ValidateProduct_SendingValidUPC_ExpectTrue() {
-		String UPC = "889661008491";
-		MF_Product product = new MF_Product(UPC);
-		assertTrue(MF_ProductValidator.validate().Product(product));
-	}
+//Deprecated - Business logic now requires at least 1 date and a valid UPC to validate the product.
+// 12/21/2015
+//	@Test
+//	public void ValidateProduct_SendingValidUPC_ExpectTrue() {
+//		String UPC = "889661008491";
+//		MF_Product product = new MF_Product(UPC);
+//		assertTrue(MF_ProductValidator.validate().Product(product));
+//	}
 	
 	@Test
 	public void ValidateProduct_SendingNullUPC_ExpectFalse() {
@@ -78,6 +82,15 @@ public class MF_ProductValidatorTest {
 	public void ValidateProduct_SendingNullProduct_ExpectFalse(){
 		MF_Product product = null;
 		assertFalse(MF_ProductValidator.validate().Product(product));
+	}
+	
+	@Test
+	public void ValidateProduct_SendingInvalidProductNullPrices_ExpectFalse() {
+		String UPC = "889661008491";
+		ArrayList<MF_Price> prices = null;
+		MF_Product product = new MF_Product(UPC, prices);
+		assertFalse(MF_ProductValidator.validate().Product(product));
+		
 	}
 
 }
