@@ -50,10 +50,12 @@ public class MF_ProductValidator {
 	 * @return The validation state.
 	 */
 	public boolean PriceList(ArrayList<MF_Price> priceList) {
+		
+		if (priceList == null) {
+			return false;
+		}
 		for (MF_Price price : priceList){
-			if ((price.getPrice() == 0.00) || (price.getPrice() == Math.abs(price.getPrice()))){
-				return false;
-			} else if (price.getDate() == null) {
+			if (!Price(price)) {
 				return false;
 			}
 		}
@@ -66,7 +68,9 @@ public class MF_ProductValidator {
 	 * @return The validation state.
 	 */
 	public boolean Price(MF_Price price) {
-		if ((price.getPrice() == 0.00) || (price.getPrice() == Math.abs(price.getPrice()))){
+		if (price == null) {
+			return false;
+		} else if ((price.getPrice() == 0.00) || (price.getPrice() != Math.abs(price.getPrice()))){
 			return false;
 		} else if (price.getDate() == null) {
 			return false;

@@ -98,11 +98,68 @@ public class MF_ProductValidatorTest {
 	
 	@Test
 	public void ValidatePrice_SendingValidPrice_ExpectTrue(){
-		
+		MF_Price testPrice = new MF_Price(266.33, new Date(), "Walmart");
+		assertTrue(MF_ProductValidator.validate().Price(testPrice));		
 	}
 	@Test
-	public void ValidatePrice_SendingInalidPrice_ExpectFalse(){
-		
+	public void ValidatePrice_SendingInvalidPrice_ExpectFalse(){
+		MF_Price testPrice = new MF_Price();
+		assertFalse(MF_ProductValidator.validate().Price(testPrice));
 	}
+	@Test 
+	public void ValidatePrice_Sending0_ExpectFalse() {
+		MF_Price testPrice = new MF_Price(0.0, new Date());
+		assertFalse(MF_ProductValidator.validate().Price(testPrice));
+	}
+	@Test
+	public void ValidatePrice_SendingNullDate_ExpectFalse() {
+		Date date = null;
+		MF_Price testPrice = new MF_Price(26.33, date);
+		assertFalse(MF_ProductValidator.validate().Price(testPrice));
+	}
+	@Test
+	public void ValidatePrice_SendingNull_ExpectFalse() {
+		MF_Price testPrice = null;
+		assertFalse(MF_ProductValidator.validate().Price(testPrice));
+	}
+	@Test
+	public void ValidatePrice_SendingNegativePrice_ExpectFalse() {
+		MF_Price testPrice = new MF_Price(-33.22, new Date());
+		assertFalse(MF_ProductValidator.validate().Price(testPrice));
+	}
+	
+	@Test
+	public void ValidatePriceList_SendingNull_ExpectFalse() {
+		ArrayList<MF_Price> priceList = null;
+		assertFalse(MF_ProductValidator.validate().PriceList(priceList));
+	}
+	@Test
+	public void ValidatePriceList_SendingValidPriceList_ExpectTrue() {
+		ArrayList<MF_Price> priceList = new ArrayList<MF_Price> ();
+		
+		priceList.add(new MF_Price(45.33, new Date(), "Amazon"));
+		priceList.add(new MF_Price(325.33, new Date(), "Walmart"));
+		priceList.add(new MF_Price(535.25, new Date(), "Amazon"));
+		priceList.add(new MF_Price(400.00, new Date(), "Walmart"));
+		priceList.add(new MF_Price(99.99, new Date()));
+		
+		assertTrue(MF_ProductValidator.validate().PriceList(priceList));
+	}
+	@Test
+	public void ValidatePriceList_SendingInvalidList_ExpectFalse() {
+		ArrayList<MF_Price> priceList = new ArrayList<MF_Price> ();
+		
+		MF_Price invalidPrice = new MF_Price(-23.55, new Date(), "Walmart");
+		
+		priceList.add(new MF_Price(45.33, new Date(), "Amazon"));
+		priceList.add(new MF_Price(325.33, new Date(), "Walmart"));
+		priceList.add(invalidPrice);
+		priceList.add(new MF_Price(535.25, new Date(), "Amazon"));
+		priceList.add(new MF_Price(400.00, new Date(), "Walmart"));
+		priceList.add(new MF_Price(99.99, new Date()));
+		
+		assertFalse(MF_ProductValidator.validate().PriceList(priceList));
+	}
+	
 
 }
