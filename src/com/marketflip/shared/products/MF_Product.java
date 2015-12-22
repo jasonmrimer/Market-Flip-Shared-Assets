@@ -8,13 +8,12 @@ import java.util.HashMap;
 /*
  * @author David Walters
  * Product holds all information on price points, descriptors and URL to the product on the company's website.
- * @Updated - 11/1/2015
+ * @Updated - 12/21/2015
  * TODO:
  * 	-comments
  */
 public class MF_Product {
 
-	private String					company;
 	private String 					name;
 	private String 					description;
 	private String 					UPC;
@@ -39,18 +38,19 @@ public class MF_Product {
 		this.weight 		= 0.0f;
 	}
 	
-	public MF_Product(String upc) {
-		this.name	 		= null;
-		this.description 	= null;
-		this.UPC 			= upc;
-		this.UNSPSC 		= null;
-		this.linkToProduct 	= null;
-		this.prices 		= null;
-		this.height 		= 0.0f;
-		this.width 			= 0.0f;
-		this.length 		= 0.0f;
-		this.weight 		= 0.0f;
-	}
+// @Deprecated - business logic must be that a product needs a UPC and at least 1 price.
+//	public MF_Product(String upc) {
+//		this.name	 		= null;
+//		this.description 	= null;
+//		this.UPC 			= upc;
+//		this.UNSPSC 		= null;
+//		this.linkToProduct 	= null;
+//		this.prices 		= null;
+//		this.height 		= 0.0f;
+//		this.width 			= 0.0f;
+//		this.length 		= 0.0f;
+//		this.weight 		= 0.0f;
+//	}
 
 	public MF_Product(String name, String description, String UPC, String UNSPSC, URL linkToProduct,
 			ArrayList<MF_Price> prices, double height, double width, double length, double weight) {
@@ -69,14 +69,14 @@ public class MF_Product {
 	public MF_Product(String UPC, ArrayList<MF_Price> priceList) {
 		this.UPC = UPC;
 		this.prices = priceList;
-	}
-	
-	public String getCompany() {
-		return company;
-	}
-	
-	public void setCompany(String company) {
-		this.company = company;
+		this.name	 		= null;
+		this.description 	= null;
+		this.UNSPSC 		= null;
+		this.linkToProduct 	= null;
+		this.height 		= 0.0f;
+		this.width 			= 0.0f;
+		this.length 		= 0.0f;
+		this.weight 		= 0.0f;
 	}
 	
 	public String getName() {
@@ -244,7 +244,6 @@ public class MF_Product {
 	 * Prints a stream with the variabes from this class. Primarily used for development and testing.
 	 */
 	public void print() {
-		System.out.println ("Company: " + this.company);
 		System.out.println ("Name: " + this.name);
 		System.out.println ("Description: " + this.description);
 		System.out.println ("UPC: " + this.UPC);

@@ -155,5 +155,26 @@ public class MF_Price {
 		return "Price: " + this.price + " Date: " + this.date.toString() +
 				" Company: " + this.company;
 	}
+	
+	/**
+	 * @return Boolean If the price values are equal.
+	 * @param The MF_Price object to check against this.
+	 */
+	public boolean equals (MF_Price price) {
+		if (this.price == price.getPrice()) {
+			if (this.date.equals(price.getDate())){
+				
+				if (this.company != null && price.getCompany() != null){
+					if (this.company.equals(price.getCompany())){
+						return true;
+					}
+				} else {
+					return true;
+				}
+				
+			}
+		}
+		return false;
+	}
 
 }

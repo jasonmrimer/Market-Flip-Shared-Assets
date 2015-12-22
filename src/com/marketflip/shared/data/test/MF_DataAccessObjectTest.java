@@ -145,5 +145,21 @@ public class MF_DataAccessObjectTest {
 		
 		assertFalse(MF_DataAccessObject.getDAO().getCommitList().contains(product));
 	}
+	
+	@Test
+	public void IsInCommitList_SendingValidProduct_ExpectTrue () {
+		String UPC = "889661008491";
+		
+		ArrayList<MF_Price> priceList = new ArrayList<MF_Price>();
+		MF_Price price = new MF_Price(26.33, "Amazon");
+		priceList.add(price);
+		
+		MF_Product product = new MF_Product(UPC, priceList);
+		MF_DataAccessObject.getDAO().addProductToCommit(product);
+		
+		assertFalse(MF_DataAccessObject.getDAO().addProductToCommit(product));
+		
+		
+	}
 
 }

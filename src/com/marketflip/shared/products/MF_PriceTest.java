@@ -134,5 +134,40 @@ public class MF_PriceTest {
 		assertTrue(testPrice.getPrice() == price);	
 		
 	}
+	
+	@Test
+	public void Equals_SendingEqualPrice_ExpectTrue() {
+		
+		MF_Price testPrice = new MF_Price(28.33, new Date());
+		MF_Price testAgainstPrice = new MF_Price(28.33, new Date());
+		
+		assertTrue(testPrice.equals(testAgainstPrice));
+	}
+	
+	@Test
+	public void Equals_SendingUnequalDate_ExpectFalse() {
+		
+		MF_Price testPrice = new MF_Price (28.33, new Date());
+		MF_Price testAgainstPrice = new MF_Price (28.33, new Date(1449407412));
+		
+		assertFalse(testPrice.equals(testAgainstPrice));
+	}
+	
+	@Test
+	public void Equals_SendingUnequalPrice_ExpectFalse() {
+		
+		MF_Price testPrice = new MF_Price(5656.22, new Date());
+		MF_Price testAgainstPrice = new MF_Price(333.33, new Date());
+		
+		assertFalse(testPrice.equals(testAgainstPrice));
+	}
+	
+	@Test 
+	public void Equals_SendingEqualCompany_ExpectTrue () {
+		MF_Price testPrice = new MF_Price(223.33, new Date(), "Walmart");
+		MF_Price testAgainstPrice = new MF_Price(223.33, new Date(), "Walmart");
+		
+		assertTrue(testPrice.equals(testAgainstPrice));
+	}
 
 }

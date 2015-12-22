@@ -113,6 +113,11 @@ public class MF_DataAccessObject {
 			return false;
 		}
 		
+		if (isInCommitList(product)){
+			System.err.println("ERROR: Product is already in queue to be committed.");
+			return false;
+		}
+		
 		if (!MF_ProductValidator.validate().Product(product)) {
 			return false;
 		} else if (isInCommitList(product)) {
@@ -166,25 +171,55 @@ public class MF_DataAccessObject {
 			PreparedStatement	insert_info_statement;
 			PreparedStatement	insert_price_statement;
 			
+			
+			// Mandatory parameters to be entered. No checking necessary.
 			String 				upc				= product.getUPC();
-			String 				name			= product.getName();
-			String 				UNSPSC			= product.getUNSPSC();
-			String 				description		= product.getDescription();
-			//This is broken at the moment. Logged in Asana.
-			String				company			= product.getCompany();
+			ArrayList<MF_Price> priceList		= product.getPrices();
+			
+			
+			// The following parameters are not necessary to insert but should be set to something
+			// Either "" or 0 depending on variable type.
+			String				name;
+			if (product.getName() == null) {
+				name = "_";
+			} else {
+				name = product.getName();
+			}
+			
+			String 				UNSPSC;
+			if (product.getUNSPSC() == null) {
+				UNSPSC = "_";
+			} else {
+				UNSPSC = product.getUNSPSC();
+			}
+			
+			String description;
+			if (product.getDescription() == null) {
+				description = "_";
+			} else {
+				description = product.getDescription();
+			}
+			
 			double 				height			= product.getHeight();
 			double 				width			= product.getWidth();
 			double 				length			= product.getLength();
 			double 				weight			= product.getWeight();
-			URL					linkToProduct	= product.getLinkToProduct();
-			ArrayList<MF_Price> priceList		= product.getPrices();
+			
+			URL linkToProduct;
+			if (product.getLinkToProduct() == null) {
+				linkToProduct = new URL("unknown");
+				
+			}
+			
 			double 				lowestPrice 	= product.getCurrentLowestPrice().getPrice();
 			
+			//TODO: Separate out price and product insertion logic.
+				//Create a standard insertion statement and iterate through each price.
 			
 			
 			// Prepare statements.
 			sql_create_info_table	 =		"CREATE TABLE UPC_" + upc + "_INFO ("
-										+	" COMPANY			int(11)			NOT NULL, "
+										+	" COMPANY			int(11)			DEFAULT NULL, "
 										+	" UPC				varchar(45)		NOT NULL,"
 										+ 	" NAME				varchar(100)	DEFAULT NULL,"
 										+ 	" HEIGHT			varchar(15)		DEFAULT NULL,"
@@ -202,7 +237,6 @@ public class MF_DataAccessObject {
 			
 			sql_create_price_table	=		"CREATE TABLE UPC_" + upc + "_PRICE ("
 										+	" DATE 						datetime 	NOT NULL DEFAULT CURRENT_TIMESTAMP,"
-										+	" COMPANY_" + company + " 	double 		DEFAULT NULL,"
 										+	" UNIQUE KEY DATE_UNIQUE_" + upc + " (DATE) ); ";
 					
 			sql_insert_product =			"INSERT INTO PRODUCTS.PRODUCTS "
