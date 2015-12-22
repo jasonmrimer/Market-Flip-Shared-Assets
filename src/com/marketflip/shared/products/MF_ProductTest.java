@@ -59,5 +59,14 @@ public class MF_ProductTest {
 		assertTrue(testPrice.getDate().getTime() == truePrice.getDate().getTime());
 		assertTrue(testPrice.getPrice() == truePrice.getPrice());	
 	}
+	
+	@Test
+	public void ConstructorUPCPrice_SendingOnePrice_ExpectInArrayList () {
+		MF_Price price = new MF_Price(45.22, new Date(), "Walmart");
+		String UPC = "889661008491";
+		MF_Product product = new MF_Product(UPC, price);
+		
+		assertTrue (product.getPrices().contains(price));
+	}
 
 }

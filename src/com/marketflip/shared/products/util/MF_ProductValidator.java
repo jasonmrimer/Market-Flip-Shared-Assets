@@ -1,7 +1,10 @@
 package com.marketflip.shared.products.util;
 
+import java.util.ArrayList;
+
 import org.apache.commons.validator.routines.checkdigit.EAN13CheckDigit;
 
+import com.marketflip.shared.products.MF_Price;
 import com.marketflip.shared.products.MF_Product;
 
 /**
@@ -41,6 +44,38 @@ public class MF_ProductValidator {
 		}
 	}
 	
+	/**
+	 * Checks if the prices in the price list are valid.
+	 * @param priceList the Pricelist to check.
+	 * @return The validation state.
+	 */
+	public boolean PriceList(ArrayList<MF_Price> priceList) {
+		for (MF_Price price : priceList){
+			if ((price.getPrice() == 0.00) || (price.getPrice() == Math.abs(price.getPrice()))){
+				return false;
+			} else if (price.getDate() == null) {
+				return false;
+			}
+		}
+		return true;
+	}
+	
+	/**
+	 * Checks if the price given is valid.
+	 * @param price The price to check.
+	 * @return The validation state.
+	 */
+	public boolean Price(MF_Price price) {
+		if ((price.getPrice() == 0.00) || (price.getPrice() == Math.abs(price.getPrice()))){
+			return false;
+		} else if (price.getDate() == null) {
+			return false;
+		} else {
+			return true;
+		}
+		
+	}
+	
 	
 	/**
 	 * Validates an MF_Product based on it's properties and business logic of Market Flip.
@@ -59,6 +94,11 @@ public class MF_ProductValidator {
 				valid = false;
 			}
 			if (product.getPrices() == null || product.getPrices().isEmpty()) {
+				System.err.println ("ERROR: Price cannot be null or empty.");
+				valid = false;
+			}
+			if (!MF_ProductValidator.validate().PriceList(product.getPrices())) {
+				System.err.println ("ERROR: Prices cannot be validated.");
 				valid = false;
 			}
 			

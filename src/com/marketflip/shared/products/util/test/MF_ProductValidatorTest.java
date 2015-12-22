@@ -9,6 +9,7 @@ import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
 import java.util.ArrayList;
+import java.util.Date;
 
 import org.junit.After;
 import org.junit.AfterClass;
@@ -59,22 +60,24 @@ public class MF_ProductValidatorTest {
 	@Test
 	public void ValidateProduct_SendingInvalidUPC_ExpectFalse() {
 		String UPC = "56774";
-		MF_Product product = new MF_Product(UPC);
+		MF_Price price = new MF_Price(23.33, new Date());
+		MF_Product product = new MF_Product(UPC, price);
 		assertFalse(MF_ProductValidator.validate().Product(product));
 	}
-//Deprecated - Business logic now requires at least 1 date and a valid UPC to validate the product.
-// 12/21/2015
-//	@Test
-//	public void ValidateProduct_SendingValidUPC_ExpectTrue() {
-//		String UPC = "889661008491";
-//		MF_Product product = new MF_Product(UPC);
-//		assertTrue(MF_ProductValidator.validate().Product(product));
-//	}
+
+	@Test
+	public void ValidateProduct_SendingValidUPC_ExpectTrue() {
+		String UPC = "889661008491";
+		MF_Price price = new MF_Price(45.33, new Date());
+		MF_Product product = new MF_Product(UPC, price);
+		assertTrue(MF_ProductValidator.validate().Product(product));
+	}
 	
 	@Test
 	public void ValidateProduct_SendingNullUPC_ExpectFalse() {
 		String UPC = null;
-		MF_Product product = new MF_Product(UPC);
+		MF_Price price = new MF_Price(45.33, new Date());
+		MF_Product product = new MF_Product(UPC, price);
 		assertFalse(MF_ProductValidator.validate().Product(product));
 	}
 	
@@ -90,6 +93,15 @@ public class MF_ProductValidatorTest {
 		ArrayList<MF_Price> prices = null;
 		MF_Product product = new MF_Product(UPC, prices);
 		assertFalse(MF_ProductValidator.validate().Product(product));
+		
+	}
+	
+	@Test
+	public void ValidatePrice_SendingValidPrice_ExpectTrue(){
+		
+	}
+	@Test
+	public void ValidatePrice_SendingInalidPrice_ExpectFalse(){
 		
 	}
 

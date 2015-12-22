@@ -79,6 +79,21 @@ public class MF_Product {
 		this.weight 		= 0.0f;
 	}
 	
+	public MF_Product(String UPC, MF_Price price) {
+		this.UPC = UPC;
+		ArrayList<MF_Price> priceList = new ArrayList<MF_Price>();
+		priceList.add(price);
+		this.prices 		= priceList;
+		this.name	 		= null;
+		this.description 	= null;
+		this.UNSPSC 		= null;
+		this.linkToProduct 	= null;
+		this.height 		= 0.0f;
+		this.width 			= 0.0f;
+		this.length 		= 0.0f;
+		this.weight 		= 0.0f;
+	}
+	
 	public String getName() {
 		return name;
 	}
