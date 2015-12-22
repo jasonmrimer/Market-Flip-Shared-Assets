@@ -1,7 +1,7 @@
 /**
  * JUnit class for MF_ProductTest
  * @author Dave Walters
- * Last Updated: 12/4/2015
+ * Last Updated: 12/22/2015
  */
 package com.marketflip.shared.products;
 

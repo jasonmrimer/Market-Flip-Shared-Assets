@@ -1,27 +1,23 @@
 package com.marketflip.shared.data;
 
-import java.net.URL;
 import java.sql.Connection;
 import java.sql.DriverManager;
-import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
-import java.util.ArrayList;
 import java.util.HashSet;
-
-import com.marketflip.shared.products.MF_Price;
-import com.marketflip.shared.products.MF_Product;
-import com.marketflip.shared.products.util.MF_ProductValidator;
 
 public class MF_DataAccessObject {
 	
-	private static final String IP 			= ***REMOVED***;
-	private static final String URL 		= "jdbc:mysql://" + IP + ":3306/PRODUCTS";
-	private static final String USERNAME 	= ***REMOVED***;   //SHAME!! TODO: End the shame.
-	private static final String PASSWORD	= ***REMOVED***;       //SHAME!! TODO: End the shame.
+	protected static final String PRODUCTION_IP 			= ***REMOVED***;
+//	protected static final String TESTING_IP				= "173.194.250.75"; //I can't assign an IP address to the replica for some reason????
+	protected static final String TESTING_IP				= ***REMOVED***;
+	protected static final String PRODUCTION_URL 			= "jdbc:mysql://" + PRODUCTION_IP + ":3306/PRODUCTS";
+	protected static final String TESTING_URL 			= "jdbc:mysql://" + TESTING_IP + ":3306/PRODUCTS";
+	protected static final String USERNAME 				= ***REMOVED***;   //SHAME!! TODO: End the shame.
+	protected static final String PASSWORD				= ***REMOVED***;       //SHAME!! TODO: End the shame.
 	
-	private static final int 	
+	protected static final int 	
 		INFO_COMPANY_INDEX  		= 1,
 		INFO_UPC_INDEX				= 2,
 		INFO_NAME_INDEX				= 3,
@@ -32,29 +28,34 @@ public class MF_DataAccessObject {
 		INFO_URL_INDEX				= 8,
 		INFO_CURRENT_PRICE_INDEX	= 9;
 	
-	private static final int	
+	protected static final int	
 		PRICE_DATE_INDEX			= 1,
 		PRICE_COMPANY_INDEX			= 2;
 	
-	private Connection 						connection;
-	private HashSet<String> 				productSet 			= new HashSet<String> ();
-	private static MF_DataAccessObject 		MF_DAO				= null;
-	private ArrayList<MF_Product>			productsToCommit 	= new ArrayList<MF_Product>();
+	private String 			environment;
+	private String			childType;
+	private HashSet<String> productSet = new HashSet<String> ();
+	protected Connection 	connection;
 	
-	
-	public static void openConnection() {
-		MF_DAO = new MF_DataAccessObject();
-	}
-	
-	public static MF_DataAccessObject getDAO () {
-		if (MF_DAO != null) {
-			return MF_DAO;
+	/**
+	 * Constructor for a DAO object.
+	 * @param environment - The environment this is to be ran in. Production or testing.
+	 * @param childType - The child type, Insert or Get
+	 */
+	public MF_DataAccessObject (String environment, String childType) {
+		
+		if (!environment.equals("production") && (!environment.equals("testing"))){
+			System.err.println("ERROR: Invalid environment, using test mode by default.");
+			this.environment = "testing";
 		} else {
-			return null;
+			this.environment = environment;
 		}
-	}
-	
-	private MF_DataAccessObject () {
+		if (!childType.equals("Insertion") && (!childType.equals("Get"))){
+			this.childType = "master";
+		} else {
+			this.childType = childType;
+		}
+		
 		try {
 			
 			String 		sql;
@@ -63,13 +64,24 @@ public class MF_DataAccessObject {
 			
 			DriverManager.registerDriver(new com.mysql.jdbc.Driver());
 			Class.forName("com.mysql.jdbc.Driver");
-			connection = DriverManager.getConnection(URL, USERNAME, PASSWORD);
+			
+			if (environment.equals("production")) {
+				connection = DriverManager.getConnection(PRODUCTION_URL, USERNAME, PASSWORD);
+				System.out.println("Using production environment.");
+			} else if (environment.equals("testing")) {
+				connection = DriverManager.getConnection(TESTING_URL, USERNAME, PASSWORD);
+				System.out.println("Using test environment.");
+			}
 			
 			connection.setAutoCommit(false);
 			
 			sql = "SELECT UPC FROM PRODUCTS";
 			sqlStatement = connection.createStatement();
 			rs = sqlStatement.executeQuery(sql);
+			
+			if (!rs.next()) {
+				throw new Exception();
+			}
 			
 			while (rs.next()) {
 				String upc = rs.getString("UPC");
@@ -82,7 +94,7 @@ public class MF_DataAccessObject {
 			e.printStackTrace();
 		}
 	}
-	
+
 	/**
 	 * Attempts to close the Connection for this instance.
 	 * The MF_DatabaseAccessObject should always be closed when the program is done using
@@ -92,252 +104,52 @@ public class MF_DataAccessObject {
 		
 		try {
 			this.connection.close();
-			MF_DataAccessObject.MF_DAO = null;
 		} catch (Exception e) {
 			System.err.println ("Error closing connection: ");
 			e.printStackTrace();
 		}
 	}
 	
-	/**
-	 * Adds a product to the list of products to be committed.
-	 * @param product
-	 * 	The product to be committed.
-	 * @return
-	 * 	Returns true if product passes validation and is not already in the products to commit.
-	 */
-	public boolean addProductToCommit (MF_Product product) {
-		
-		if (productsToCommit.size() == 20) {
-			System.err.println("ERROR: Maximum number of products to be committed at once completed.");
-			return false;
-		}
-		
-		if (isInCommitList(product)){
-			System.err.println("ERROR: Product is already in queue to be committed.");
-			return false;
-		}
-		
-		if (!MF_ProductValidator.validate().Product(product)) {
-			return false;
-		} else if (isInCommitList(product)) {
-			return false;
-		}
-		productsToCommit.add(product);
-		return true;
+	public String getEnvironment () {
+		return environment;
 	}
 	
 	/**
-	 * Commits the list of products to the database.
-	 */
-	public boolean commitProductsToDatabase () {
-		
-		if (productsToCommit.isEmpty()) {
-			System.err.println("ERROR: No products to commit to database.");
-			return false;
-		}
-		try {
-			for (MF_Product product : productsToCommit) {
-					if (!insertProduct(product)) {
-						return false;
-					}
-			}
-			connection.commit();
-		} catch (SQLException e) {
-			System.err.println("ERROR: Insertion of products failed: ");
-			e.printStackTrace();
-		}
-		return true;
-	}
-	
-	/**
-	 * Insert a new Product into the database.
-	 * @param MF_Product Product to be inserted
+	 * Returns if the connection to the database is open.
+	 * @return Boolean True if the connection is open.
 	 * @throws SQLException 
 	 */
-	private boolean insertProduct(MF_Product product) throws SQLException {
-
-		try {
-			
-			String				sql_create_info_table;
-			String				sql_create_price_table;
-			String				sql_insert_info;
-			String				sql_insert_price;
-			String				sql_insert_product;
-			
-			Statement			create_info_table;
-			Statement			create_price_table;
-			Statement			insert_product_statement;
-			PreparedStatement	insert_info_statement;
-			PreparedStatement	insert_price_statement;
-			
-			
-			// Mandatory parameters to be entered. No checking necessary.
-			String 				upc				= product.getUPC();
-			ArrayList<MF_Price> priceList		= product.getPrices();
-			
-			
-			// The following parameters are not necessary to insert but should be set to something
-			// Either "" or 0 depending on variable type.
-			String				name;
-			if (product.getName() == null) {
-				name = "_";
-			} else {
-				name = product.getName();
-			}
-			
-			String 				UNSPSC;
-			if (product.getUNSPSC() == null) {
-				UNSPSC = "_";
-			} else {
-				UNSPSC = product.getUNSPSC();
-			}
-			
-			String description;
-			if (product.getDescription() == null) {
-				description = "_";
-			} else {
-				description = product.getDescription();
-			}
-			
-			double 				height			= product.getHeight();
-			double 				width			= product.getWidth();
-			double 				length			= product.getLength();
-			double 				weight			= product.getWeight();
-			
-			URL linkToProduct;
-			if (product.getLinkToProduct() == null) {
-				linkToProduct = new URL("unknown");
-				
-			}
-			
-			double 				lowestPrice 	= product.getCurrentLowestPrice().getPrice();
-			
-			//TODO: Separate out price and product insertion logic.
-				//Create a standard insertion statement and iterate through each price.
-			
-			
-			// Prepare statements.
-			sql_create_info_table	 =		"CREATE TABLE UPC_" + upc + "_INFO ("
-										+	" COMPANY			int(11)			DEFAULT NULL, "
-										+	" UPC				varchar(45)		NOT NULL,"
-										+ 	" NAME				varchar(100)	DEFAULT NULL,"
-										+ 	" HEIGHT			varchar(15)		DEFAULT NULL,"
-										+	" WIDTH				varchar(15)		DEFAULT	NULL,"
-										+ 	" LENGTH			varchar(15)		DEFAULT NULL,"
-										+ 	" DESCRIPTION		varchar(300)	DEFAULT NULL,"
-										+	" URL				varchar(300)	DEFAULT NULL,"
-										+	" CURRENT_PRICE		varchar(45)		DEFAULT NULL,"
-										+	" KEY UPC_FK_idx		(UPC),"
-										+ 	" KEY COMPANY_FK_idx	(COMPANY),"
-										+ 	" CONSTRAINT COMPANY_FK_" + upc + " FOREIGN KEY (COMPANY) REFERENCES COMPANIES"
-										+ 	" (COMPANY_ID) ON DELETE NO ACTION ON UPDATE NO ACTION,"
-										+	" CONSTRAINT UPC_FK_" + upc + " FOREIGN KEY (UPC) REFERENCES PRODUCTS(UPC)"
-										+	" ON DELETE NO ACTION ON UPDATE NO ACTION ); ";
-			
-			sql_create_price_table	=		"CREATE TABLE UPC_" + upc + "_PRICE ("
-										+	" DATE 						datetime 	NOT NULL DEFAULT CURRENT_TIMESTAMP,"
-										+	" UNIQUE KEY DATE_UNIQUE_" + upc + " (DATE) ); ";
-					
-			sql_insert_product =			"INSERT INTO PRODUCTS.PRODUCTS "
-										+ 	" (UPC, DEPRECATED) "
-										+ 	" VALUES (" + upc + ", 0);";
-			
-			sql_insert_info =				"INSERT INTO PRODUCTS.UPC_" + upc + "_INFO "
-										+	" (COMPANY, UPC, NAME, HEIGHT, WIDTH, LENGTH, DESCRIPTION, URL, CURRENT_PRICE) "
-										+	"VALUES (?,?,?,?,?,?,?,?,?); ";
-			
-			sql_insert_price =				"INSERT INTO PRODUCTS.UPC_" + upc + "_PRICE "
-										+	" (DATE, COMPANY_" + company + ") "
-										+	" VALUES (?,?);";
-			
-			create_price_table 		= connection.createStatement();
-			create_info_table 		= connection.createStatement();
-			insert_product_statement= connection.createStatement();
-			insert_price_statement	= connection.prepareStatement(sql_insert_price);
-			insert_info_statement	= connection.prepareStatement(sql_insert_info);
-			
-			
-			
-			//Find the lowest price from all of the prices listed and set price batches.
-			for (MF_Price price : priceList){
-				
-				java.sql.Date convertedDate = dateToSQLDate(price.getDate());
-				insert_price_statement.setDate(1, convertedDate);
-				insert_price_statement.setDouble(2, price.getPrice());
-				insert_price_statement.addBatch();
-			}
-
-			// Set the values for the info table.
-			insert_info_statement.setString(1, company);
-			insert_info_statement.setString(2, upc);
-			insert_info_statement.setString(3, name);
-			insert_info_statement.setDouble(4, height);
-			insert_info_statement.setDouble(5, width);
-			insert_info_statement.setDouble(6, length);
-			insert_info_statement.setString(7, description);
-			insert_info_statement.setString(8, linkToProduct.toExternalForm());
-			insert_info_statement.setDouble(9, lowestPrice);		
-			
-			// Execute statements.
-			create_info_table.executeUpdate(sql_create_info_table);
-			create_price_table.executeUpdate(sql_create_price_table);
-			insert_product_statement.executeUpdate(sql_insert_product);
-			insert_info_statement.executeUpdate();
-			insert_price_statement.executeBatch();
-			
-			// Close the statements.
-			create_info_table.close();
-			create_price_table.close();
-			insert_product_statement.close();
-			insert_info_statement.close();
-			insert_price_statement.close();
-
-			productSet.add(upc);
-			return true;
-			
-			
-		} catch (Exception e) {
-			System.err.println("ERROR: Failed to insert new product: ");
-			e.printStackTrace();
-			connection.rollback();
+	public boolean isOpen() throws SQLException {
+		if (connection.isClosed()) {
 			return false;
+		} else {
+			return true;
 		}
 	}
 	
 	/**
-	 * 
-	 * @param String UPC The UPC of the product that needs to be checked.
-	 * @return boolean Whether the product exists in the database.
+	 * If this class has a child class, returns the child type. If No child class, returns 'master'.
+	 * @return String the child node type.
 	 */
-	public boolean productExists (String UPC) {
-		return (productSet.contains(UPC));
+	public String getChildType() {
+		return childType;
 	}
 	
-	private java.sql.Date dateToSQLDate(java.util.Date date) {
+	/**
+	 * Utility class to convert util.Date object to sql.Date object.
+	 * @param date The java.util.Data object to convert.
+	 * @return date The converted java.sql.Date object.
+	 */
+	protected java.sql.Date dateToSQLDate(java.util.Date date) {
 	    return new java.sql.Date(date.getTime());
 	}
 	
 	/**
-	 * Checks to see if product is in productsToCommit
-	 * @param product to check
-	 * @return True if product is in the list.
+	 * A list of UPCs in the database.
+	 * @return HashSet<String> UPCs in the database.
 	 */
-	private boolean isInCommitList(MF_Product product) {
-		for (MF_Product testProduct : this.productsToCommit) {
-			if (testProduct.equals(testProduct)){
-				return true;
-			}
-		}
-		return false;
-	}
-	
-	/**
-	 * Returns the current product list for the DAO of items not inserted to the database.
-	 * @return ArrayList<MF_Product> The products awaiting insertion to database.
-	 */
-	public ArrayList<MF_Product> getCommitList () {
-		return this.productsToCommit;
+	public HashSet<String> getProductSet() {
+		return this.productSet;
 	}
 
 }
