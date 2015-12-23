@@ -1,6 +1,7 @@
 package com.marketflip.shared.data;
 
 import com.marketflip.shared.products.MF_Product;
+import com.marketflip.shared.products.util.MF_ProductValidator;
 
 public class MF_GetDAO  extends MF_DataAccessObject {
 
@@ -16,8 +17,18 @@ public class MF_GetDAO  extends MF_DataAccessObject {
 	 */
 	public MF_Product getProduct(String UPC) {
 		
-		return new MF_Product();
+		if (UPC == null) {
+			System.err.println("ERROR: Product cannot be null.");
+			return null;
+		} else if (!MF_ProductValidator.validate().UPC(UPC)) {
+			System.err.println("ERROR: UPC is not valid.");
+			return null;
+		} else if (!super.getProductSet().contains(UPC)) {
+			System.err.println("ERROR: Product not contained in database.");
+			return null;
+		}
 		
+		return new MF_Product();
 	}
 	
 	/**
@@ -29,6 +40,19 @@ public class MF_GetDAO  extends MF_DataAccessObject {
 	public MF_Product getProduct(MF_Product product) {
 		
 		String UPC = product.getUPC();
+		
+		if (UPC == null) {
+			System.err.println("ERROR: Product cannot be null.");
+			return null;
+		} else if (!MF_ProductValidator.validate().Product(product)) {
+			System.err.println("ERROR: UPC is not valid.");
+			return null;
+		} else if (!super.getProductSet().contains(UPC)) {
+			System.err.println("ERROR: Product not contained in database.");
+			return null;
+		}
+		
+		
 		
 		return new MF_Product();
 	}

@@ -218,7 +218,7 @@ public class MF_Product {
 	 *         a match.
 	 */
 	public int compareTo(MF_Product product) {
-		if (this.UPC == product.getUPC()) {
+		if (this.UPC.equals(product.getUPC())) {
 			return 1;
 		} else if (this.UNSPSC == product.getUNSPSC()) {
 			return 1;
@@ -241,15 +241,17 @@ public class MF_Product {
 	 * @return boolean Returns true if the product is a reasonable match.
 	 */
 	public boolean equals(MF_Product product) {
-		if (this.UPC == product.getUPC()) {
+		if (this.UPC.equals(product.getUPC())) {
 			return true;
-		} else if (this.UNSPSC == product.getUNSPSC()) {
+		} else if (this.UNSPSC == product.getUNSPSC() && product.getUNSPSC() != null) {
 			return true;
-		} else if (this.description == product.getDescription()) {
+		} else if (this.description == product.getDescription()  && product.getDescription() != null) {
 			return true;
-		} else if (this.name == product.getName()) {
-			if (this.weight * 1.1 >= product.getWeight() && this.weight * 0.9 <= product.getWeight()) {
-				return true;
+		} else if (this.name.equals(product.getName())  && product.getName() != null) {
+			if (product.getWeight() != 0) {
+				if (this.weight * 1.1 >= product.getWeight() && this.weight * 0.9 <= product.getWeight()) {
+					return true;
+				}
 			}
 		}
 		return false;
@@ -263,7 +265,9 @@ public class MF_Product {
 		System.out.println ("Description: " + this.description);
 		System.out.println ("UPC: " + this.UPC);
 		System.out.println ("UNSPSC: " + this.UNSPSC);
-		System.out.println ("URL: " + this.linkToProduct.toExternalForm());
+		if (this.linkToProduct != null) {
+			System.out.println ("URL: " + this.linkToProduct.toExternalForm());
+		}
 		System.out.println ("Height: " + this.height);
 		System.out.println ("Width: " + this.width);
 		System.out.println ("Length: " + this.length);

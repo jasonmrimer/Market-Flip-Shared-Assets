@@ -160,12 +160,11 @@ public class MF_InsertDAO extends MF_DataAccessObject {
 			
 			sql_create_price_table	=		"CREATE TABLE UPC_" + upc + "_PRICE ("
 										+	" DATE 						datetime 	NOT NULL DEFAULT CURRENT_TIMESTAMP,"
-										+	" COMPANY_" + company + " 	double 		DEFAULT NULL,"
-										+	" UNIQUE KEY DATE_UNIQUE_" + upc + " (DATE) ); ";
+										+	" COMPANY_" + company + " 	double 		DEFAULT NULL);";
 					
 			sql_insert_product =			"INSERT INTO PRODUCTS.PRODUCTS "
 										+ 	" (UPC, DEPRECATED) "
-										+ 	" VALUES (" + upc + ", 0);";
+										+ 	" VALUES ('" + upc + "', 0);";
 			
 			sql_insert_info =				"INSERT INTO PRODUCTS.UPC_" + upc + "_INFO "
 										+	" (COMPANY, UPC, NAME, HEIGHT, WIDTH, LENGTH, DESCRIPTION, URL, CURRENT_PRICE) "
@@ -181,11 +180,12 @@ public class MF_InsertDAO extends MF_DataAccessObject {
 			insert_price_statement	= connection.prepareStatement(sql_insert_price);
 			insert_info_statement	= connection.prepareStatement(sql_insert_info);
 			
+			insert_product_statement.executeUpdate(sql_insert_product);
+			
 			
 			
 			//Find the lowest price from all of the prices listed and set price batches.
 			for (MF_Price price : priceList){
-				
 				java.sql.Date convertedDate = dateToSQLDate(price.getDate());
 				insert_price_statement.setDate(1, convertedDate);
 				insert_price_statement.setDouble(2, price.getPrice());
@@ -202,11 +202,11 @@ public class MF_InsertDAO extends MF_DataAccessObject {
 			insert_info_statement.setString(7, description);
 			insert_info_statement.setString(8, linkToProduct.toExternalForm());
 			insert_info_statement.setDouble(9, lowestPrice);		
-			
+
 			// Execute statements.
 			create_info_table.executeUpdate(sql_create_info_table);
 			create_price_table.executeUpdate(sql_create_price_table);
-			insert_product_statement.executeUpdate(sql_insert_product);
+
 			insert_info_statement.executeUpdate();
 			insert_price_statement.executeBatch();
 			
@@ -235,8 +235,8 @@ public class MF_InsertDAO extends MF_DataAccessObject {
 	 * @return True if product is in the list.
 	 */
 	private boolean isInCommitList(MF_Product product) {
-		for (MF_Product testProduct : this.productsToCommit) {
-			if (testProduct.equals(testProduct)){
+		for (MF_Product testProduct : getCommitList()) {
+			if (testProduct.equals(product)){
 				return true;
 			}
 		}
