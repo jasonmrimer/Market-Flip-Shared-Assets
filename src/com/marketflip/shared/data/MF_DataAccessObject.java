@@ -10,7 +10,6 @@ import java.util.HashSet;
 public class MF_DataAccessObject {
 	
 	protected static final String PRODUCTION_IP 			= ***REMOVED***;
-//	protected static final String TESTING_IP				= "173.194.250.75"; //I can't assign an IP address to the replica for some reason????
 	protected static final String TESTING_IP				= ***REMOVED***;
 	protected static final String PRODUCTION_URL 			= "jdbc:mysql://" + PRODUCTION_IP + ":3306/PRODUCTS";
 	protected static final String TESTING_URL 			= "jdbc:mysql://" + TESTING_IP + ":3306/PRODUCTS";

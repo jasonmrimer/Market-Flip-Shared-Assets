@@ -64,7 +64,7 @@ public class MF_InsertDAO extends MF_DataAccessObject {
 		try {
 			for (MF_Product product : productsToCommit) {
 					if (!insertProduct(product)) {
-						System.err.println("Fail here");
+						super.connection.rollback();
 						return false;
 					}
 			}
