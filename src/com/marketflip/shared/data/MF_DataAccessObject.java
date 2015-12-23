@@ -49,9 +49,7 @@ public class MF_DataAccessObject {
 		} else {
 			this.environment = environment;
 		}
-		if (!childType.equals("Insertion") && (!childType.equals("Get"))){
-			this.childType = "master";
-		} else {
+		if (childType != null) {
 			this.childType = childType;
 		}
 		
