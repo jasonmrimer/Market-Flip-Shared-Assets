@@ -30,18 +30,11 @@ public class MF_InsertAndGetDAOTest {
 
 	@AfterClass
 	public static void tearDownAfterClass() throws Exception {
+		
 	}
 
 	@Before
 	public void setUp() throws Exception {
-		
-		if (DAO != null) {
-			if (!DAO.isOpen()){
-				DAO.close();
-			}
-		}
-		DAO = new MF_ProductsDAO("testing");
-
 	}
 
 	@After
@@ -53,22 +46,46 @@ public class MF_InsertAndGetDAOTest {
 	}
 	
 	@Test
-	public void Environment_Testing_ExpectTesting () {
+	public void Environment_Testing_ExpectTesting () throws SQLException {
+		if (DAO != null) {
+			if (DAO.isOpen()) {
+				DAO.close();
+			}
+		}
+		DAO = new MF_ProductsDAO ("testing");
 		assertTrue(DAO.getEnvironment().equals("testing"));
 	}
 	@Test
-	public void ChildType_Implicit_ExpectProducts () {
+	public void ChildType_Implicit_ExpectProducts () throws SQLException {
+		if (DAO != null) {
+			if (DAO.isOpen()) {
+				DAO.close();
+			}
+		}
+		DAO = new MF_ProductsDAO ("testing");
 		assertTrue(DAO.getChildType().equals("Products"));
 	}
 	
 	@Test
-	public void AddProductToCommit_SendingNull_ExpectFalse () {
+	public void AddProductToCommit_SendingNull_ExpectFalse () throws SQLException {
+		if (DAO != null) {
+			if (DAO.isOpen()) {
+				DAO.close();
+			}
+		}
+		DAO = new MF_ProductsDAO ("testing");
 		MF_Product product = null;
 		assertFalse(DAO.addProductToCommit(product));
 	}
 	
 	@Test
-	public void AddProductToCommit_SendingValidProduct_ExpectTrue() {
+	public void AddProductToCommit_SendingValidProduct_ExpectTrue() throws SQLException {
+		if (DAO != null) {
+			if (DAO.isOpen()) {
+				DAO.close();
+			}
+		}
+		DAO = new MF_ProductsDAO ("testing");
 		
 		String UPC = "889661008491";
 		
@@ -81,7 +98,14 @@ public class MF_InsertAndGetDAOTest {
 	}
 	
 	@Test
-	public void AddProductToCommit_SendingValidProduct_ExpectInArrayList () {
+	public void AddProductToCommit_SendingValidProduct_ExpectInArrayList () throws SQLException {
+		if (DAO != null) {
+			if (DAO.isOpen()) {
+				DAO.close();
+			}
+		}
+		DAO = new MF_ProductsDAO ("testing");
+		
 		String UPC = "889661008491";
 		
 		ArrayList<MF_Price> priceList = new ArrayList<MF_Price>();
@@ -96,7 +120,13 @@ public class MF_InsertAndGetDAOTest {
 	}
 	
 	@Test
-	public void AddProductToCommit_SendingInvalidProduct_ExpectFalse() {
+	public void AddProductToCommit_SendingInvalidProduct_ExpectFalse() throws SQLException {
+		if (DAO != null) {
+			if (DAO.isOpen()) {
+				DAO.close();
+			}
+		}
+		DAO = new MF_ProductsDAO ("testing");
 		String UPC = "xcvxcv";
 
 		ArrayList<MF_Price> priceList = new ArrayList<MF_Price>();
@@ -108,7 +138,13 @@ public class MF_InsertAndGetDAOTest {
 	}
 	
 	@Test
-	public void AddProductToCommit_SendingInvalidProduct_ExpectNotInArrayList() {
+	public void AddProductToCommit_SendingInvalidProduct_ExpectNotInArrayList() throws SQLException {
+		if (DAO != null) {
+			if (DAO.isOpen()) {
+				DAO.close();
+			}
+		}
+		DAO = new MF_ProductsDAO ("testing");
 		String UPC = "xcvxcv";
 
 		ArrayList<MF_Price> priceList = new ArrayList<MF_Price>();
@@ -122,7 +158,13 @@ public class MF_InsertAndGetDAOTest {
 	}
 	
 	@Test
-	public void AddProductToCommit_SendingValidDuplicateProduct_ExpectFalse () {
+	public void AddProductToCommit_SendingValidDuplicateProduct_ExpectFalse () throws SQLException {
+		if (DAO != null) {
+			if (DAO.isOpen()) {
+				DAO.close();
+			}
+		}
+		DAO = new MF_ProductsDAO ("testing");
 		String UPC = "889661008491";
 		
 		ArrayList<MF_Price> priceList = new ArrayList<MF_Price>();
@@ -145,7 +187,14 @@ public class MF_InsertAndGetDAOTest {
 	}
 	
 	@Test
-	public void CommitProductsToDatabase_SendingOneValidProduct_ExpectTrue () {
+	public void CommitProductsToDatabase_SendingOneValidProduct_ExpectTrue () throws SQLException {
+		if (DAO != null) {
+			if (DAO.isOpen()) {
+				DAO.close();
+			}
+		}
+		DAO = new MF_ProductsDAO ("testing");
+		
 		String UPC = "0044600301853";
 		ArrayList<MF_Price> priceList = new ArrayList<MF_Price> ();
 		priceList.add(new MF_Price(15.75, "Walmart"));
@@ -158,10 +207,17 @@ public class MF_InsertAndGetDAOTest {
 		DAO.commitProductsToDatabase();
 
 		assertTrue(DAO.getProductSet().contains(UPC));
+		DAO.delete(product);
 	}
 	
 	@Test
-	public void CommitProductsToDatabase_SendingMultipleValidProducts_ExpectTrue () {
+	public void CommitProductsToDatabase_SendingMultipleValidProducts_ExpectTrue () throws SQLException {
+		if (DAO != null) {
+			if (DAO.isOpen()) {
+				DAO.close();
+			}
+		}
+		DAO = new MF_ProductsDAO ("testing");
 		
 		ArrayList<MF_Product> testingList = new ArrayList<MF_Product> ();
 		String UPC1 = "0041215021107";
@@ -200,10 +256,21 @@ public class MF_InsertAndGetDAOTest {
 		assertTrue(DAO.getProductSet().contains(product1.getUPC()));
 		assertTrue(DAO.getProductSet().contains(product2.getUPC()));
 		assertTrue(DAO.getProductSet().contains(product3.getUPC()));
+		
+		DAO.delete(product1);
+		DAO.delete(product2);
+		DAO.delete(product3);
 	}
 	
 	@Test
 	public void GetProduct_SendingOneValidProduct_ExpectEqualProduct () throws SQLException {
+		
+		if (DAO != null) {
+			if (DAO.isOpen()) {
+				DAO.close();
+			}
+		}
+		DAO = new MF_ProductsDAO ("testing");
 		
 		String UPC1 = "0018964059224";
 		ArrayList<MF_Price> priceList1 = new ArrayList<MF_Price> ();
@@ -220,6 +287,7 @@ public class MF_InsertAndGetDAOTest {
 		testProduct = DAO.getProduct(product1);
 		
 		assertTrue(product1.equals(testProduct));
+		DAO.delete(product1);
 	}
 	
 	@Test
@@ -282,12 +350,12 @@ public class MF_InsertAndGetDAOTest {
 		
 		DAO.addProductToCommit(product);
 		DAO.commitProductsToDatabase();
-		DAO.getProductSet().add(UPC); //TODO: This should not be here. The database manager thread will hold the master list. To do for proto 2.
 		
 		MF_Product testProduct;
 		testProduct = DAO.getProduct(product);
 		
 		assertTrue(MF_ProductValidator.validate().Product(testProduct));
+		DAO.delete(product);
 	}
 	
 	@Test
@@ -312,6 +380,7 @@ public class MF_InsertAndGetDAOTest {
 		testProduct = DAO.getProduct(UPC);
 		
 		assertTrue(product.equals(testProduct));
+		DAO.delete(product);
 	}
 	
 	@Test
@@ -334,6 +403,105 @@ public class MF_InsertAndGetDAOTest {
 		MF_Product testProduct;
 		testProduct = DAO.getProduct(UPC);
 		assertTrue(MF_ProductValidator.validate().Product(testProduct));
+		DAO.delete(product);
+	}
+	
+	@Test
+	public void DeleteUPC_InvalidUPC_ExpectFalse() throws SQLException {
+		if (DAO != null) {
+			if (!DAO.isOpen()){
+				DAO.close();
+			}
+		}
+		DAO = new MF_ProductsDAO ("testing");
+		String UPC = "5643211";
+		assertFalse(DAO.delete(UPC));
+	}
+	
+	@Test
+	public void DeleteProduct_InvalidProduct_ExpectFalse() throws SQLException {
+		if (DAO != null) {
+			if (!DAO.isOpen()){
+				DAO.close();
+			}
+		}
+		DAO = new MF_ProductsDAO ("testing");
+		MF_Product product = new MF_Product("33333", new ArrayList<MF_Price>());
+		assertFalse(DAO.delete(product));
+	}
+	
+	@Test
+	public void DeleteProduct_ValidProductNotInDatabase_ExpectFalse() throws SQLException {
+		if (DAO != null) {
+			if (!DAO.isOpen()){
+				DAO.close();
+			}
+		}
+		DAO = new MF_ProductsDAO ("testing");
+		
+		String UPC = "0083791070100";
+		ArrayList<MF_Price> priceList = new ArrayList<MF_Price> ();
+		priceList.add(new MF_Price(782.55, "Amazon"));
+		MF_Product product = new MF_Product(UPC, priceList);
+		
+		assertFalse(DAO.delete(product));
+	}
+	
+	@Test
+	public void DeleteUPC_ValidUPCNotInDatabase_ExpectFalse() throws SQLException {
+		if (DAO != null) {
+			if (!DAO.isOpen()){
+				DAO.close();
+			}
+		}
+		DAO = new MF_ProductsDAO ("testing");
+		
+		String UPC = "0083791070100";
+		
+		assertFalse(DAO.delete(UPC));
+	}
+	
+	
+	@Test
+	public void DeleteUPC_ValidUPC_ExpectTrue() throws SQLException {
+	
+		if (DAO != null) {
+			if (!DAO.isOpen()){
+				DAO.close();
+			}
+		}
+		DAO = new MF_ProductsDAO ("testing");
+		
+		String UPC = "0813263011900";
+		ArrayList<MF_Price> priceList = new ArrayList<MF_Price> ();
+		priceList.add(new MF_Price(35.12, "Amazon"));
+		MF_Product product = new MF_Product(UPC, priceList);
+		
+		DAO.addProductToCommit(product);
+		DAO.commitProductsToDatabase();
+		
+		assertTrue(DAO.delete(UPC));
+	}
+	
+	@Test
+	public void DeleteUPC_ValidUPC_ExpectNotInProductSet() throws SQLException {
+	
+		if (DAO != null) {
+			if (!DAO.isOpen()){
+				DAO.close();
+			}
+		}
+		DAO = new MF_ProductsDAO ("testing");
+		
+		String UPC = "0735340904465";
+		ArrayList<MF_Price> priceList = new ArrayList<MF_Price> ();
+		priceList.add(new MF_Price(25.22, "Amazon"));
+		MF_Product product = new MF_Product(UPC, priceList);
+		
+		DAO.addProductToCommit(product);
+		DAO.commitProductsToDatabase();
+		DAO.delete(UPC);
+		assertFalse(DAO.getProductSet().contains(UPC));
 	}
 	
 	

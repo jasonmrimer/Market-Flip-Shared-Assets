@@ -292,10 +292,10 @@ public class MF_ProductsDAO extends MF_DataAccessObject {
 			String 				name			= null;
 			String 				UNSPSC			= null;
 			String 				description		= null;
-			double 				height			= 0.0;
-			double 				width			= 0.0;
-			double 				length			= 0.0;
-			double 				weight			= 0.0;
+			double 				height;
+			double 				width;
+			double 				length;
+			double 				weight;
 			URL					linkToProduct	= null;
 			ArrayList<MF_Price> priceList		= new ArrayList<MF_Price>();
 			Date				date			= null;
@@ -350,8 +350,6 @@ public class MF_ProductsDAO extends MF_DataAccessObject {
 			}
 			
 			returnProduct = new MF_Product ();
-			
-			
 			returnProduct.setUPC(upc_result);
 			returnProduct.setPrices(priceList);
 			
@@ -390,7 +388,7 @@ public class MF_ProductsDAO extends MF_DataAccessObject {
 			System.err.println("ERROR: Product cannot be null.");
 			return null;
 		} else if (!MF_ProductValidator.validate().Product(product)) {
-			System.err.println("ERROR: UPC is not valid.");
+			System.err.println("ERROR: Product is not valid.");
 			return null;
 		} else if (!super.getProductSet().contains(UPC)) {
 			System.err.println("ERROR: Product not contained in database.");
@@ -414,10 +412,10 @@ public class MF_ProductsDAO extends MF_DataAccessObject {
 			String 				name			= null;
 			String 				UNSPSC			= null;
 			String 				description		= null;
-			double 				height			= 0.0;
-			double 				width			= 0.0;
-			double 				length			= 0.0;
-			double 				weight			= 0.0;
+			double 				height;
+			double 				width;
+			double 				length;
+			double 				weight;
 			URL					linkToProduct	= null;
 			ArrayList<MF_Price> priceList		= new ArrayList<MF_Price>();
 			Date				date			= null;
@@ -472,16 +470,12 @@ public class MF_ProductsDAO extends MF_DataAccessObject {
 			}
 			
 			returnProduct = new MF_Product ();
-			
-			
 			returnProduct.setUPC(upc_result);
 			returnProduct.setPrices(priceList);
 			
 			if (name != null) returnProduct.setName(name);
 			if (description != null) returnProduct.setDescription(description);
 			if (linkToProduct != null) returnProduct.setLinkToProduct(linkToProduct);
-			
-			
 			
 			info_statement.close();
 			price_statement.close();
@@ -494,6 +488,115 @@ public class MF_ProductsDAO extends MF_DataAccessObject {
 			connection.rollback();
 			return new MF_Product();
 		}	
+	}
+	/**
+	 * Delete the specified product from the database.
+	 * @param Product The Product to be deleted from the database.
+	 * @return True if successful.
+	 * @throws SQLException
+	 */
+	public boolean delete (MF_Product product) throws SQLException {
+		String UPC = product.getUPC();
+		if (UPC == null) {
+			System.err.println("ERROR: Product cannot be null.");
+			return false;
+		} else if (!MF_ProductValidator.validate().Product(product)) {
+			System.err.println("ERROR: Product is not valid.");
+			return false;
+		} else if (!super.getProductSet().contains(UPC)) {
+			System.err.println("ERROR: Product not contained in database.");
+			return false;
+		}
+		try {	
+			String				sql_info;
+			String				sql_price;
+			String				sql_products;
+			Statement 			info_statement;
+			Statement			price_statement;
+			Statement			delete_statement;
+			
+			sql_info = "DROP TABLE UPC_" + UPC + "_INFO";
+			sql_price = "DROP TABLE UPC_" + UPC + "_PRICE";
+			sql_products = "DELETE FROM PRODUCTS " +
+						"WHERE UPC = " + UPC;
+			info_statement = connection.createStatement();
+			price_statement = connection.createStatement();
+			delete_statement = connection.createStatement();
+			
+			info_statement.executeUpdate(sql_info);
+			price_statement.executeUpdate(sql_price);
+			delete_statement.executeUpdate(sql_products);
+
+			delete_statement.close();
+			info_statement.close();
+			price_statement.close();
+			
+			connection.commit();
+			super.getProductSet().remove(UPC);
+			return true;
+			
+		} catch (Exception e) {
+			System.err.println("ERROR: Unable to delete table.");
+			e.printStackTrace();
+			connection.rollback();
+			return false;
+		}	
+		
+	}
+	
+	/**
+	 * Delete the specified product from the database.
+	 * @param UPC The UPC of the product to be deleted.
+	 * @return True if successful.
+	 * @throws SQLException
+	 */
+	public boolean delete (String UPC) throws SQLException {
+		
+		if (UPC == null) {
+			System.err.println("ERROR: Product cannot be null.");
+			return false;
+		} else if (!MF_ProductValidator.validate().UPC(UPC)) {
+			System.err.println("ERROR: UPC is not valid.");
+			return false;
+		} else if (!super.getProductSet().contains(UPC)) {
+			System.err.println("ERROR: Product not contained in database.");
+			return false;
+		}
+		try {	
+			String				sql_info;
+			String				sql_price;
+			String				sql_products;
+			Statement 			info_statement;
+			Statement			price_statement;
+			Statement			delete_statement;
+			
+			sql_info = "DROP TABLE UPC_" + UPC + "_INFO";
+			sql_price = "DROP TABLE UPC_" + UPC + "_PRICE";
+			sql_products = "DELETE FROM PRODUCTS " +
+						"WHERE UPC = " + UPC;
+			info_statement = connection.createStatement();
+			price_statement = connection.createStatement();
+			delete_statement = connection.createStatement();
+			
+			info_statement.executeUpdate(sql_info);
+			price_statement.executeUpdate(sql_price);
+			delete_statement.executeUpdate(sql_products);
+
+			delete_statement.close();
+			info_statement.close();
+			price_statement.close();
+			
+			connection.commit();
+			super.getProductSet().remove(UPC);
+			return true;
+			
+		} catch (Exception e) {
+			System.err.println("ERROR: Unable to delete table.");
+			e.printStackTrace();
+			connection.rollback();
+			return false;
+		}	
+		
 	}
 
 }
