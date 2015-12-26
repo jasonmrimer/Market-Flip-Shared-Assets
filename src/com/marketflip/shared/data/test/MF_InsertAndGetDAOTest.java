@@ -252,7 +252,7 @@ public class MF_InsertAndGetDAOTest {
 		
 		DAO.commitProductsToDatabase();
 		
-		//I know multiple asserts are normally bad form, but I want to make sure ALL products were added.
+		//multiple asserts are normally bad form, but I want to make sure ALL products were added.
 		assertTrue(DAO.getProductSet().contains(product1.getUPC()));
 		assertTrue(DAO.getProductSet().contains(product2.getUPC()));
 		assertTrue(DAO.getProductSet().contains(product3.getUPC()));
