@@ -220,7 +220,6 @@ public class MF_ProductsDAO extends MF_DataAccessObject {
 			insert_info_statement.close();
 			insert_price_statement.close();
 			
-			super.getProductSet().add(product.getUPC());
 			return true;
 			
 			
@@ -269,9 +268,6 @@ public class MF_ProductsDAO extends MF_DataAccessObject {
 			return null;
 		} else if (!MF_ProductValidator.validate().UPC(UPC)) {
 			System.err.println("ERROR: UPC is not valid.");
-			return null;
-		} else if (!super.getProductSet().contains(UPC)) {
-			System.err.println("ERROR: Product not contained in database.");
 			return null;
 		}
 		try {
@@ -390,9 +386,6 @@ public class MF_ProductsDAO extends MF_DataAccessObject {
 		} else if (!MF_ProductValidator.validate().Product(product)) {
 			System.err.println("ERROR: Product is not valid.");
 			return null;
-		} else if (!super.getProductSet().contains(UPC)) {
-			System.err.println("ERROR: Product not contained in database.");
-			return null;
 		}
 		try {
 			
@@ -503,9 +496,6 @@ public class MF_ProductsDAO extends MF_DataAccessObject {
 		} else if (!MF_ProductValidator.validate().Product(product)) {
 			System.err.println("ERROR: Product is not valid.");
 			return false;
-		} else if (!super.getProductSet().contains(UPC)) {
-			System.err.println("ERROR: Product not contained in database.");
-			return false;
 		}
 		try {	
 			String				sql_info;
@@ -532,7 +522,6 @@ public class MF_ProductsDAO extends MF_DataAccessObject {
 			price_statement.close();
 			
 			connection.commit();
-			super.getProductSet().remove(UPC);
 			return true;
 			
 		} catch (Exception e) {
@@ -587,7 +576,6 @@ public class MF_ProductsDAO extends MF_DataAccessObject {
 			price_statement.close();
 			
 			connection.commit();
-			super.getProductSet().remove(UPC);
 			return true;
 			
 		} catch (Exception e) {

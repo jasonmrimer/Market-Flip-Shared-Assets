@@ -33,7 +33,6 @@ public class MF_DataAccessObject {
 	
 	private String 			environment;
 	private String			childType;
-	private HashSet<String> productSet = new HashSet<String> ();
 	protected Connection 	connection;
 	
 	/**
@@ -55,10 +54,6 @@ public class MF_DataAccessObject {
 		
 		try {
 			
-			String 		sql;
-			Statement 	sqlStatement;
-			ResultSet	rs;
-			
 			DriverManager.registerDriver(new com.mysql.jdbc.Driver());
 			Class.forName("com.mysql.jdbc.Driver");
 			
@@ -71,20 +66,6 @@ public class MF_DataAccessObject {
 			}
 			
 			connection.setAutoCommit(false);
-			
-			sql = "SELECT UPC FROM PRODUCTS";
-			sqlStatement = connection.createStatement();
-			rs = sqlStatement.executeQuery(sql);
-			
-			if (!rs.next()) {
-				throw new Exception();
-			}
-			
-			while (rs.next()) {
-				String upc = rs.getString("UPC");
-				productSet.add(upc);
-			}
-			
 		}
 		catch (Exception e) {
 			System.err.println("Error connecting to CloudSQL: ");
@@ -142,11 +123,31 @@ public class MF_DataAccessObject {
 	}
 	
 	/**
-	 * A list of UPCs in the database.
+	 * Returns a list of UPCs in the database.
 	 * @return HashSet<String> UPCs in the database.
+	 * @throws SQLException 
 	 */
-	public HashSet<String> getProductSet() {
-		return this.productSet;
+	public HashSet<String> getUpdatedProductList() throws Exception {
+		
+		String 		sql;
+		Statement 	sqlStatement;
+		ResultSet	rs;
+		HashSet<String> productSet = new HashSet<String>();
+		
+		sql = "SELECT UPC FROM PRODUCTS";
+		sqlStatement = connection.createStatement();
+		rs = sqlStatement.executeQuery(sql);
+		
+		if (!rs.next()) {
+			throw new Exception();
+		}
+		
+		while (rs.next()) {
+			String upc = rs.getString("UPC");
+			productSet.add(upc);
+		}
+		
+		return productSet;
 	}
 
 }
