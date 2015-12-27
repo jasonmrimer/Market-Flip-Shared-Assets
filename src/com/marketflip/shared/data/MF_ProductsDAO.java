@@ -547,10 +547,7 @@ public class MF_ProductsDAO extends MF_DataAccessObject {
 		} else if (!MF_ProductValidator.validate().UPC(UPC)) {
 			System.err.println("ERROR: UPC is not valid.");
 			return false;
-		} else if (!super.getProductSet().contains(UPC)) {
-			System.err.println("ERROR: Product not contained in database.");
-			return false;
-		}
+		} 
 		try {	
 			String				sql_info;
 			String				sql_price;
