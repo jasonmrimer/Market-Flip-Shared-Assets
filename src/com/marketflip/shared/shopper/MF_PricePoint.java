@@ -1,4 +1,4 @@
-package com.marketflip.shared.products;
+package com.marketflip.shared.shopper;
 
 /**
  * The purpose of this class is to act as a tuple then later as a integrity check when shoppers
