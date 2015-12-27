@@ -11,13 +11,13 @@ package com.marketflip.shared.products;
  * @author highball
  *
  */
-public class MF_PricePoint<String, Double> {
+public class MF_PricePoint implements Comparable<MF_PricePoint> {
 
 	private final String	productTableID;
 	private final Double	price;
 
 	public MF_PricePoint(String productUPC, Double price) {
-		this.productTableID = (String) ("UPC_" + productUPC);
+		this.productTableID = "UPC_" + productUPC;
 		this.price = price;
 	}
 
@@ -40,5 +40,18 @@ public class MF_PricePoint<String, Double> {
 
 	public Double getPrice() {
 		return price;
+	}
+
+	@Override
+	public String toString() {
+		String toString;
+		toString = "MF_PricePoint object with product UPC = " + this.productTableID + " & price = "
+				+ this.price + ".";
+		return toString;
+	}
+
+	public int compareTo(MF_PricePoint inPP) {
+		int lastCmp = productTableID.compareTo(inPP.productTableID);
+		return (lastCmp != 0 ? lastCmp : price.compareTo(inPP.price));
 	}
 }
