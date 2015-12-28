@@ -24,7 +24,7 @@ public class MF_Shopper {
 	private HashMap<MF_Product, MF_PricePoint> pricePointMap;
 	
 	/**
-	 * default constructors for MF_Shopper
+	 * Default constructor for MF_Shopper
 	 */
 	public MF_Shopper () {
 		this.userName 		= null;
@@ -36,7 +36,7 @@ public class MF_Shopper {
 	}
 	
 	/**
-	 * sets minimum information needed to userName and email
+	 * Minimum information needed for a shopper is a username and email.
 	 * @param userName - username of shopper
 	 * @param email - email address of shopper
 	 */
@@ -63,9 +63,9 @@ public class MF_Shopper {
 		}		
 		pricePointMap.put(product, pricePoint);
 	}
-	
+
 	/**
-	 * This method checks to see if the shopper is the same
+	 * This method checks to see if the shopper is reasonably considered to be equal.
 	 * @param shopper - an MF_Shopper object 
 	 * @return true if the shopper's username matches itself and isn't a default value
 	 */
@@ -77,80 +77,80 @@ public class MF_Shopper {
 	}
 
 	/**
-	 * getter method for userName
-	 * @return - userName
+	 * Returns the user's username.
+	 * @return - String User's username.
 	 */
 	public String getUserName() {
 		return userName;
 	}
 
 	/**
-	 * setter method for userName
-	 * @param userName - value assigned to this.userName
+	 * Set the user's username.
+	 * @param userName - The username of the shopper.
 	 */
 	public void setUserName(String userName) {
 		this.userName = userName;
 	}
 
 	/**
-	 * getter method for firstName
-	 * @return - firstName
+	 * Returns the user's first name.
+	 * @return - String - User's first name.
 	 */
 	public String getFirstName() {
 		return firstName;
 	}
 
 	/**
-	 * setter method for firstName
-	 * @param firstName - value assigned to this.firstName
+	 * Set the user's first name.
+	 * @param firstName - The user's first name.
 	 */
 	public void setFirstName(String firstName) {
 		this.firstName = firstName;
 	}
 
 	/**
-	 * getter method for lastName
-	 * @return - lastName
+	 * Returns shopper's last name.
+	 * @return String The shopper's last name.
 	 */
 	public String getLastName() {
 		return lastName;
 	}
 
 	/**
-	 * setter method for lastName
-	 * @param lastName - value assigned to this.lastName
+	 * Set shopper's last name.
+	 * @param lastName - The shopper's last name.
 	 */
 	public void setLastName(String lastName) {
 		this.lastName = lastName;
 	}
 
 	/**
-	 * getter method for email
-	 * @return - email
+	 * Returns the shopper's email.
+	 * @return String Shopper's email address.
 	 */
 	public String getEmail() {
 		return email;
 	}
 
 	/**
-	 * setter method for email
-	 * @param email - value assigned to this.email
+	 * Set the user's email.
+	 * @param email - The user's email.
 	 */
 	public void setEmail(String email) {
 		this.email = email;
 	}
 	
 	/**
-	 * getter method for phoneNumber
-	 * @return - phoneNumber
+	 * Returns the user's phone number.
+	 * @return String The user' email.
 	 */
 	public String getPhoneNumber() {
 		return phoneNumber;
 	}
 
 	/**
-	 * setter method for phoneNumber
-	 * @param phoneNumber - value assigned to this.phoneNumber
+	 * Set the shopper's phone number.
+	 * @param phoneNumber - The user's phone number.
 	 */
 	public void setPhoneNumber(String phoneNumber) {
 		this.phoneNumber = phoneNumber;
