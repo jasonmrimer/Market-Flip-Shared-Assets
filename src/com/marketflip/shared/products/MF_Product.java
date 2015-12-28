@@ -258,7 +258,7 @@ public class MF_Product {
 	}
 	
 	/**
-	 * Prints a stream with the variabes from this class. Primarily used for development and testing.
+	 * Prints a stream with the variables from this class. Primarily used for development and testing.
 	 */
 	public void print() {
 		System.out.println ("Name: " + this.name);
