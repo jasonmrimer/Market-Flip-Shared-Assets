@@ -156,4 +156,13 @@ public class MF_Shopper {
 		this.phoneNumber = phoneNumber;
 	}
 
+	/**
+	 * Returns a HashMap<MF_Product, MF_PricePoint> of the shopper's 
+	 * products and respective pricepoints 
+	 * @return - HashMap<MF_Product, MF_PricePoint> - shopper's
+	 * products and respective pricepoints.
+	 */
+	public HashMap<MF_Product, MF_PricePoint> getPricePointMap() {
+		return pricePointMap;
+	}
 }
