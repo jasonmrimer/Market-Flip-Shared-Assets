@@ -22,22 +22,24 @@ import com.google.appengine.repackaged.org.apache.commons.codec.digest.DigestUti
  */
 public class MF_ShopperDAO {
 
-	private ArrayList<String>	tableNameArrayList;
+	private ArrayList<String>	arrayListOfTableNames;
 	private Connection			conn;
-	private String				tableNameShoppers					= "Shoppers";
+	private String				columnNameProductTableID			= "ProductTableID";
+	private String				columnNamePricePoint				= "PricePoint";
 	private String				columnNameShopperID					= "ShopperID";
 	private String				columnNameShopperEmail				= "ShopperEmail";
 	private String				columnNameShopperPricePointTableRef	= "PricePointTableReference";
 	private String				hostURL								= "jdbc:mysql://173.194.249.229:3306/Shoppers?user=root";	//:3306/Shoppers?user=root
-	private String				username							= "Jason";
+	private boolean				isClosed;
 	private String				password							= ***REMOVED***;
+	private String				tableNameShoppers					= "Shoppers";
 	private String				tableNamePrefixPricePoint			= "PPT_";
-	private String				columnNameProductTableID			= "ProductTableID";
-	private String				columnNamePricePoint				= "PricePoint";
+	private String				username							= "Jason";
 
 	public MF_ShopperDAO() {
-		this.tableNameArrayList = null;
+		this.arrayListOfTableNames = null;
 		this.conn = null;
+		this.isClosed = false;
 	}
 
 	public MF_ShopperDAO(boolean isMock) {
@@ -46,7 +48,7 @@ public class MF_ShopperDAO {
 			try {
 				Class.forName("com.mysql.jdbc.Driver");
 				this.conn = DriverManager.getConnection(hostURL, username, password);
-				this.tableNameArrayList = new ArrayList<String>();
+				this.arrayListOfTableNames = new ArrayList<String>();
 				//				clearAllTables();
 				//				createWebsitesTable();
 			}
@@ -148,6 +150,24 @@ public class MF_ShopperDAO {
 		createPricePointTable(emailBeforeHash);
 	}
 
+	public void close() {
+		if (isClosed) {
+			return;
+		}
+		else {
+			try {
+				if (conn != null || !conn.isClosed()) {
+					conn.close();
+					isClosed = true;
+				}
+			}
+			catch (SQLException e) {
+				System.err.println("SQLException in MF_ShopperDAO finalize");
+				e.printStackTrace();
+			}
+		}
+	}
+
 	/**
 	 * The purose of this method is to create a Shopper Table that will contain every shopper (i.e.,
 	 * user) and information regarding that shopper: shopper email address (i.e., username) and the
@@ -218,7 +238,8 @@ public class MF_ShopperDAO {
 			}
 		}
 		else {
-			System.err.println("from creatPricePointTable: Price point table already exists for " + shopperEmail);
+			System.err.println("from creatPricePointTable: Price point table already exists for "
+					+ shopperEmail);
 		}
 	}
 
@@ -247,6 +268,133 @@ public class MF_ShopperDAO {
 			System.err.println("SQLException in clearAllTables");
 			e.printStackTrace();
 		}
+	}
+
+	/**
+	 * The purose of this method is to insert all the table names into an array list in order to
+	 * analyze/test those tables creation and persistence.
+	 *
+	 */
+	public void populateTableNameArrayList() {
+		DatabaseMetaData dbMetaData;
+		ResultSet rsTables;
+		arrayListOfTableNames.clear();
+		try {
+			dbMetaData = conn.getMetaData();
+			String[] types = {"TABLE"};
+			rsTables = dbMetaData.getTables(null, null, "%", types);
+			while (rsTables.next()) {
+				arrayListOfTableNames.add(rsTables.getString("TABLE_NAME"));
+			}
+		}
+		catch (SQLException e) {
+			System.err.println("SQLException in populateTableNameArrayList");
+			e.printStackTrace();
+		}
+	}
+
+	/**
+	 * The purose of this method is to verify that the price point table for a user already exists
+	 * as it should be created upon user sign-up.
+	 *
+	 * @param shopperEmail
+	 * @return
+	 */
+	public boolean pricePointTableExists(String shopperEmail) {
+		boolean exists = false;
+		String tableNameToCheck = "PPT_" + DigestUtils.md5Hex(shopperEmail);
+		DatabaseMetaData dbMetaData;
+		ResultSet rsTables;
+		arrayListOfTableNames.clear();
+		try {
+			dbMetaData = conn.getMetaData();
+			String[] types = {"TABLE"};
+			rsTables = dbMetaData.getTables(null, null, tableNameToCheck, types);
+			if (rsTables.next()) {
+				exists = true;
+			}
+		}
+		catch (SQLException e) {
+			System.err.println("SQLException in pricePointTableExists");
+			e.printStackTrace();
+		}
+		return exists;
+	}
+
+	/**
+	 * The purose of this method is to verify that a shopper record exists by checking the shopper
+	 * table.
+	 *
+	 * @param shopperEmail
+	 * @return
+	 */
+	public boolean shopperRecordExists(String shopperEmail) {
+		boolean exists = false;
+		String emailAfterHash = DigestUtils.md5Hex(shopperEmail);
+		// add shopper row to Shoppers table
+		ResultSet selectRS = null;
+		PreparedStatement prepStatement = null;
+		String selectRecordSQLString = "SELECT * FROM " + tableNameShoppers + " WHERE "
+				+ columnNameShopperID + " = '" + emailAfterHash + "'";
+		try {
+			prepStatement = conn.prepareStatement(selectRecordSQLString);
+			//			prepStatement.setString(1, emailAfterHash);
+			// execute
+			selectRS = prepStatement.executeQuery(selectRecordSQLString);
+			if (selectRS.next()) {
+				exists = true;
+			}
+		}
+		catch (SQLException e) {
+			System.err.println("SQLException in MF_ShopperDAO shopperRecordExists.");
+			e.printStackTrace();
+		}
+		finally {
+			if (prepStatement != null) {
+				try {
+					prepStatement.close();
+				}
+				catch (SQLException e) {
+					System.err.println(
+							"SQLException in MF_ShopperDAO shopperRecordExists closing prepared statement.");
+					e.printStackTrace();
+				}
+			}
+			if (selectRS != null) {
+				try {
+					selectRS.close();
+				}
+				catch (SQLException e) {
+					System.err.println(
+							"SQLException in MF_ShopperDAO shopperRecordExists closing result set.");
+					e.printStackTrace();
+				}
+			}
+		}
+		return exists;
+	}
+
+	@Override
+	public void finalize() {
+		try {
+			close();
+		}
+		finally {
+			try {
+				super.finalize();
+			}
+			catch (Throwable e) {
+				System.err.println("Error in MF_ShopperDAO finalize:");
+				e.printStackTrace();
+			}
+		}
+	}
+
+	@Override
+	public String toString() {
+		String toString;
+		toString = "Instance of Market Flip Application Shopping Database Access Object without parameters.";
+		return toString;
 	}
 
 	/**
@@ -320,133 +468,13 @@ public class MF_ShopperDAO {
 		return pricePoints;
 	}
 
-	/**
-	 * The purose of this method is to insert all the table names into an array list in order to
-	 * analyze/test those tables creation and persistence.
-	 *
-	 */
-	public void populateTableNameArrayList() {
-		DatabaseMetaData dbMetaData;
-		ResultSet rsTables;
-		tableNameArrayList.clear();
-		try {
-			dbMetaData = conn.getMetaData();
-			String[] types = {"TABLE"};
-			rsTables = dbMetaData.getTables(null, null, "%", types);
-			while (rsTables.next()) {
-				tableNameArrayList.add(rsTables.getString("TABLE_NAME"));
-			}
-		}
-		catch (SQLException e) {
-			System.err.println("SQLException in populateTableNameArrayList");
-			e.printStackTrace();
-		}
-	}
-
-	/**
-	 * The purose of this method is to verify that the price point table for a user already exists
-	 * as it should be created upon user sign-up.
-	 *
-	 * @param shopperEmail
-	 * @return
-	 */
-	public boolean pricePointTableExists(String shopperEmail) {
-		boolean exists = false;
-		String tableNameToCheck = "PPT_" + DigestUtils.md5Hex(shopperEmail);
-		DatabaseMetaData dbMetaData;
-		ResultSet rsTables;
-		tableNameArrayList.clear();
-		try {
-			dbMetaData = conn.getMetaData();
-			String[] types = {"TABLE"};
-			rsTables = dbMetaData.getTables(null, null, tableNameToCheck, types);
-			if (rsTables.next()) {
-				exists = true;
-			}
-		}
-		catch (SQLException e) {
-			System.err.println("SQLException in pricePointTableExists");
-			e.printStackTrace();
-		}
-		return exists;
-	}
-
-	/**
-	 * The purose of this method is to verify that a shopper record exists by checking the shopper
-	 * table.
-	 *
-	 * @param shopperEmail
-	 * @return
-	 */
-	public boolean shopperRecordExists(String shopperEmail) {
-		boolean exists = false;
-		String emailAfterHash = DigestUtils.md5Hex(shopperEmail);
-		// add shopper row to Shoppers table
-		ResultSet selectRS = null;
-		PreparedStatement prepStatement = null;
-		String selectRecordSQLString = "SELECT * FROM " + tableNameShoppers + " WHERE "
-				+ columnNameShopperID + " = '" + emailAfterHash + "'";
-		try {
-			prepStatement = conn.prepareStatement(selectRecordSQLString);
-			//			prepStatement.setString(1, emailAfterHash);
-			// execute
-			selectRS = prepStatement.executeQuery(selectRecordSQLString);
-			if (selectRS.next()) {
-				exists = true;
-			}
-		}
-		catch (SQLException e) {
-			System.err.println("SQLException in MF_ShopperDAO shopperRecordExists.");
-			e.printStackTrace();
-		}
-		finally {
-			if (prepStatement != null) {
-				try {
-					prepStatement.close();
-				}
-				catch (SQLException e) {
-					System.err.println(
-							"SQLException in MF_ShopperDAO shopperRecordExists closing prepared statement.");
-					e.printStackTrace();
-				}
-			}
-			if (selectRS != null) {
-				try {
-					selectRS.close();
-				}
-				catch (SQLException e) {
-					System.err.println(
-							"SQLException in MF_ShopperDAO shopperRecordExists closing result set.");
-					e.printStackTrace();
-				}
-			}
-		}
-		return exists;
-	}
-
-	@Override
-	public void finalize() {
-		try {
-			if (conn != null || !conn.isClosed()) {
-				conn.close();
-			}
-		}
-		catch (SQLException e) {
-			System.err.println("SQLException in MF_ShopperDAO finalize");
-			e.printStackTrace();
-		}
-	}
-
-	@Override
-	public String toString() {
-		String toString;
-		toString = "Instance of Market Flip Application Shopping Database Access Object without parameters.";
-		return toString;
-	}
-
 	// GETTERS
 	public ArrayList<String> getTableNameArrayList() {
-		return tableNameArrayList;
+		return arrayListOfTableNames;
+	}
+
+	public Connection getConn() {
+		return conn;
 	}
 
 }
