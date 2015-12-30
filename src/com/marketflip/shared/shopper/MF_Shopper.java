@@ -1,7 +1,7 @@
-package com.marketflip.shared.products;
+package com.marketflip.shared.shopper;
 
 import java.util.HashMap;
-import com.marketflip.shared.products.MF_PricePoint;
+import com.marketflip.shared.shopper.MF_PricePoint;
 import com.marketflip.shared.products.MF_Product;
 
 /**
