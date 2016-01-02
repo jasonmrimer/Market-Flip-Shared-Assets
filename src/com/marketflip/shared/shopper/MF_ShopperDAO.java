@@ -9,6 +9,7 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.ArrayList;
+import java.util.HashMap;
 
 import com.google.appengine.repackaged.org.apache.commons.codec.digest.DigestUtils;
 
@@ -24,17 +25,17 @@ public class MF_ShopperDAO {
 
 	private ArrayList<String>	arrayListOfTableNames;
 	private Connection			conn;
-	private String				columnNameProductTableID			= "ProductTableID";
-	private String				columnNamePricePoint				= "PricePoint";
-	private String				columnNameShopperID					= "ShopperID";
-	private String				columnNameShopperEmail				= "ShopperEmail";
-	private String				columnNameShopperPricePointTableRef	= "PricePointTableReference";
-	private String				hostURL								= "jdbc:mysql://173.194.249.229:3306/Shoppers?user=root";	//:3306/Shoppers?user=root
+	private String				columnNameProductTableID	= "ProductTableID";
+	private String				columnNamePricePoint		= "PricePoint";
+	private String				columnNameShopperID			= "ShopperID";
+	private String				columnNameShopperEmail		= "ShopperEmail";
+	private String				columnNameShopperUsername	= "ShopperUsername";
+	private String				hostURL						= "jdbc:mysql://173.194.249.229:3306/Shoppers?user=root";	//:3306/Shoppers?user=root
 	private boolean				isClosed;
-	private String				password							= ***REMOVED***;
-	private String				tableNameShoppers					= "Shoppers";
-	private String				tableNamePrefixPricePoint			= "PPT_";
-	private String				username							= "Jason";
+	private String				password					= ***REMOVED***;
+	private String				tableNameShoppers			= "Shoppers";
+	private String				tableNamePrefixPricePoint	= "PPT_";
+	private String				username					= "Jason";
 
 	public MF_ShopperDAO() {
 		this.arrayListOfTableNames = null;
@@ -110,23 +111,21 @@ public class MF_ShopperDAO {
 		}
 	}
 
-	/**
-	 * The purose of this method is to add a shopper to the Shoppers Table. Every shopper will
-	 * automitically receive a PricePoint table (referenced by PPT_ShopperID) that will contain all
-	 * the shopper's price point inputs.
-	 *
-	 * @param emailBeforeHash
-	 */
-	public void addShopper(String emailBeforeHash) {
-		String emailAfterHash = DigestUtils.md5Hex(emailBeforeHash);
+	public void addShopper(MF_Shopper shopper) {
+		String shopperEmail, shopperUsername, shopperEmailHashed;
+		shopperEmail = shopper.getEmail();
+		shopperUsername = shopper.getUserName();
+		shopperEmailHashed = DigestUtils.md5Hex(shopperEmail);
 		// add shopper row to Shoppers table
 		PreparedStatement prepStatement = null;
 		String insertRecordSQLString = "INSERT INTO " + tableNameShoppers + " ("
-				+ columnNameShopperID + ", " + columnNameShopperEmail + ") VALUES (?,?)";
+				+ columnNameShopperID + ", " + columnNameShopperUsername + ", "
+				+ columnNameShopperEmail + ") VALUES (?,?,?)";
 		try {
 			prepStatement = conn.prepareStatement(insertRecordSQLString);
-			prepStatement.setString(1, emailAfterHash);
-			prepStatement.setString(2, emailBeforeHash);
+			prepStatement.setString(1, shopperEmailHashed);
+			prepStatement.setString(2, shopperUsername);
+			prepStatement.setString(3, shopperEmail);
 			// execute
 			prepStatement.executeUpdate();
 		}
@@ -147,7 +146,47 @@ public class MF_ShopperDAO {
 			}
 		}
 		// create shopper's price point table
-		createPricePointTable(emailBeforeHash);
+		createPricePointTable(shopper);
+	}
+
+	/**
+	 * The purpose of this method is to add a shopper to the Shoppers Table. Every shopper will
+	 * automitically receive a PricePoint table (referenced by PPT_ShopperID) that will contain all
+	 * the shopper's price point inputs.
+	 *
+	 * @param shopperEmail
+	 */
+	public void addShopper(String shopperEmail) {
+		String emailAfterHash = DigestUtils.md5Hex(shopperEmail);
+		// add shopper row to Shoppers table
+		PreparedStatement prepStatement = null;
+		String insertRecordSQLString = "INSERT INTO " + tableNameShoppers + " ("
+				+ columnNameShopperID + ", " + columnNameShopperEmail + ") VALUES (?,?)";
+		try {
+			prepStatement = conn.prepareStatement(insertRecordSQLString);
+			prepStatement.setString(1, emailAfterHash);
+			prepStatement.setString(2, shopperEmail);
+			// execute
+			prepStatement.executeUpdate();
+		}
+		catch (SQLException e) {
+			System.err.println("SQLException in MF_ShopperDAO addShopper.");
+			e.printStackTrace();
+		}
+		finally {
+			if (prepStatement != null) {
+				try {
+					prepStatement.close();
+				}
+				catch (SQLException e) {
+					System.err.println(
+							"SQLException in MF_ShopperDAO addShopper closing prepared statement.");
+					e.printStackTrace();
+				}
+			}
+		}
+		// create shopper's price point table
+		createPricePointTable(shopperEmail);
 	}
 
 	public void close() {
@@ -162,20 +201,22 @@ public class MF_ShopperDAO {
 				}
 			}
 			catch (SQLException e) {
-				System.err.println("SQLException in MF_ShopperDAO finalize");
+				System.err.println("SQLException in MF_ShopperDAO close");
 				e.printStackTrace();
 			}
 		}
 	}
 
 	/**
-	 * The purose of this method is to create a Shopper Table that will contain every shopper (i.e.,
+	 * The purpose of this method is to create a Shopper Table that will contain every shopper
+	 * (i.e.,
 	 * user) and information regarding that shopper: shopper email address (i.e., username) and the
 	 * unique identification hashed from the email address.
 	 */
-	public void createShopperTable() {
+	public void createShoppersTable() {
 		String sqlString = "CREATE TABLE " + tableNameShoppers + "(" + columnNameShopperID
-				+ " varchar(32)," + columnNameShopperEmail + " varchar(255));";
+				+ " varchar(32)," + columnNameShopperUsername + " varchar(255),"
+				+ columnNameShopperEmail + " varchar(255));";
 		Statement sqlStatement = null;
 		try {
 			sqlStatement = conn.createStatement();
@@ -198,8 +239,23 @@ public class MF_ShopperDAO {
 		}
 	}
 
+	private void createPricePointTable(MF_Shopper shopper) {
+		String shopperEmail, tableNamePricePoints, productTableID;
+		shopperEmail = shopper.getEmail();
+		// add all price points to the table
+		if (pricePointTableExists(shopperEmail)) {
+			updatePricePoints(shopper);
+		}
+		else {
+			// create the table using the email address
+			createPricePointTable(shopperEmail);
+			// add all pricepoints
+			updatePricePoints(shopper);
+		}
+	}
+
 	/**
-	 * The purose of this method is to create a Price Point Table for every shopper added to the
+	 * The purpose of this method is to create a Price Point Table for every shopper added to the
 	 * Shoppers Table. The table will contain all the products and price points the shopper adds
 	 * while shopping and will be used to iterate through in order to find price point matches and
 	 * email the shoppers. The table is named using the hased ShopperID in order to concatenate easy
@@ -244,7 +300,7 @@ public class MF_ShopperDAO {
 	}
 
 	/**
-	 * The purose of this method is to delete all the contents of the database for testing (i.e., a
+	 * The purpose of this method is to delete all the contents of the database for testing (i.e., a
 	 * rollback method)
 	 */
 	public void deleteAllTables() {
@@ -265,13 +321,13 @@ public class MF_ShopperDAO {
 			rsTables.close();
 		}
 		catch (SQLException e) {
-			System.err.println("SQLException in clearAllTables");
+			System.err.println("SQLException in MF_ShopperDAO clearAllTables");
 			e.printStackTrace();
 		}
 	}
 
 	/**
-	 * The purose of this method is to insert all the table names into an array list in order to
+	 * The purpose of this method is to insert all the table names into an array list in order to
 	 * analyze/test those tables creation and persistence.
 	 *
 	 */
@@ -294,7 +350,7 @@ public class MF_ShopperDAO {
 	}
 
 	/**
-	 * The purose of this method is to verify that the price point table for a user already exists
+	 * The purpose of this method is to verify that the price point table for a user already exists
 	 * as it should be created upon user sign-up.
 	 *
 	 * @param shopperEmail
@@ -322,7 +378,7 @@ public class MF_ShopperDAO {
 	}
 
 	/**
-	 * The purose of this method is to verify that a shopper record exists by checking the shopper
+	 * The purpose of this method is to verify that a shopper record exists by checking the shopper
 	 * table.
 	 *
 	 * @param shopperEmail
@@ -374,6 +430,62 @@ public class MF_ShopperDAO {
 		return exists;
 	}
 
+	private void updatePricePoints(MF_Shopper shopper) {
+		String shopperEmail, tableNamePricePoints, productTableID;
+		HashMap<String, MF_PricePoint> hashMapOfPricePoints;
+		ArrayList<MF_PricePoint> arrayListOfPricePoints;
+		shopperEmail = shopper.getEmail();
+		hashMapOfPricePoints = shopper.getPricePointMapKeyProductTableID();
+		// create the table name
+		tableNamePricePoints = tableNamePrefixPricePoint + DigestUtils.md5Hex(shopperEmail);
+		// update the price points 
+		arrayListOfPricePoints = this.getArrayListOfPricePoints(shopper);
+		// for each price point in the db, update if exists yet changed and add if does not exist
+		for (MF_PricePoint shopperPricePoint : hashMapOfPricePoints.values()) {
+			//		for (MF_PricePoint pricePoint : arrayListOfPricePoints) {
+			// update/replace
+			if (arrayListOfPricePoints.contains(shopperPricePoint)) {
+				//			if (hashMapOfPricePoints.containsValue(pricePoint)) {
+				// update with new hashmap value to replace old DB value
+				productTableID = shopperPricePoint.getProductTableID();
+				// 'Id' is whatever your PK column is
+				String sqlStatement = "UPDATE " + tableNamePricePoints + " SET "
+						+ columnNamePricePoint + " = ? WHERE " + columnNameProductTableID + " = ?;";
+				PreparedStatement preparedStatement = null;
+				try {
+					preparedStatement = conn.prepareStatement(sqlStatement);
+					preparedStatement.setDouble(1, shopperPricePoint.getPrice());
+					preparedStatement.setString(2, productTableID);
+					preparedStatement.executeUpdate();
+				}
+				catch (SQLException e) {
+					System.err.println(
+							"SQLException in MF_ShopperDAO createPricePointTable(MF_Shopper) executing prepared statement.");
+					e.printStackTrace();
+				}
+				finally {
+					if (preparedStatement != null) {
+						try {
+							preparedStatement.close();
+						}
+						catch (SQLException e) {
+							System.err.println(
+									"SQLException in MF_ShopperDAO createPricePointTable(MF_Shopper) closing prepared statement.");
+							e.printStackTrace();
+						}
+					}
+				}
+			}
+			// add because not in table
+			else {
+				String productUPC;
+				productUPC = shopperPricePoint.getProductTableID()
+						.replace(tableNamePrefixPricePoint, "");
+				addPricePoint(shopperEmail, productUPC, shopperPricePoint.getPrice());
+			}
+		}
+	}
+
 	@Override
 	public void finalize() {
 		try {
@@ -397,13 +509,25 @@ public class MF_ShopperDAO {
 		return toString;
 	}
 
+	public Connection getConn() {
+		return conn;
+	}
+
+	// GETTERS
+
+	public ArrayList<MF_PricePoint> getArrayListOfPricePoints(MF_Shopper shopper) {
+		ArrayList<MF_PricePoint> pricePoints = new ArrayList<MF_PricePoint>();
+		pricePoints = getArrayListOfPricePoints(shopper.getEmail());
+		return pricePoints;
+	}
+
 	/**
-	 * The purose of this method is to select all of the price points from a shopper's price point
+	 * The purpose of this method is to select all of the price points from a shopper's price point
 	 * table then insert those prices into a portable array list for analysis and testing.
 	 *
 	 * @return
 	 */
-	public ArrayList<MF_PricePoint> getPricePointArrayList(String shopperEmail) {
+	public ArrayList<MF_PricePoint> getArrayListOfPricePoints(String shopperEmail) {
 		ArrayList<MF_PricePoint> pricePoints = new ArrayList<MF_PricePoint>();
 		// Ensure shopper & shopper's price point tables exist
 		if (shopperRecordExists(shopperEmail)) {
@@ -468,13 +592,121 @@ public class MF_ShopperDAO {
 		return pricePoints;
 	}
 
-	// GETTERS
+	public MF_Shopper getShopper(MF_Shopper expectedShopper) {
+		MF_Shopper retrievedShopper = null;
+		String shopperEmail, retrievedShopperEmail, retrievedShopperUsername;
+		shopperEmail = expectedShopper.getEmail();
+		ArrayList<MF_PricePoint> pricePoints = new ArrayList<MF_PricePoint>();
+		// Ensure shopper & shopper's price point tables exist
+		ResultSet rs = null;
+		PreparedStatement prepStatement = null;
+		String selectSQLString = "SELECT * FROM " + tableNameShoppers + " WHERE "
+				+ columnNameShopperEmail + "='" + shopperEmail + "'";
+		try {
+			// prep 
+			prepStatement = conn.prepareStatement(selectSQLString);
+			// execute
+			rs = prepStatement.executeQuery(selectSQLString);
+			// transfer to arraylist
+			while (rs.next()) {
+				retrievedShopperUsername = rs.getString(columnNameShopperUsername);
+				retrievedShopperEmail = rs.getString(columnNameShopperEmail);
+				retrievedShopper = new MF_Shopper(retrievedShopperUsername, retrievedShopperEmail);
+			}
+		}
+
+		catch (SQLException e) {
+			System.err.println("SQLException in MF_ShopperDAO getShopper.");
+			e.printStackTrace();
+		}
+		finally {
+			if (prepStatement != null) {
+				try {
+					prepStatement.close();
+				}
+				catch (SQLException e) {
+					System.err.println(
+							"SQLException in MF_ShopperDAO getShopper closing prepared statement.");
+					e.printStackTrace();
+				}
+			}
+			if (rs != null) {
+				try {
+					rs.close();
+				}
+				catch (SQLException e) {
+					System.err.println(
+							"SQLException in MF_ShopperDAO getShopper closing result set.");
+					e.printStackTrace();
+				}
+			}
+		}
+		return retrievedShopper;
+	}
+
 	public ArrayList<String> getTableNameArrayList() {
+		DatabaseMetaData dbMetaData;
+		ResultSet rsTables;
+		arrayListOfTableNames.clear();
+		try {
+			dbMetaData = conn.getMetaData();
+			String[] types = {"TABLE"};
+			rsTables = dbMetaData.getTables(null, null, "%", types);
+			while (rsTables.next()) {
+				arrayListOfTableNames.add(rsTables.getString("TABLE_NAME"));
+			}
+		}
+		catch (SQLException e) {
+			System.err.println("SQLException in populateTableNameArrayList");
+			e.printStackTrace();
+		}
 		return arrayListOfTableNames;
 	}
 
-	public Connection getConn() {
-		return conn;
+	public ArrayList<MF_Shopper> getArrayListOfShoppers() {
+		ArrayList<MF_Shopper> arrayListOfShoppers = new ArrayList<MF_Shopper>();
+		ResultSet rs = null;
+		PreparedStatement prepStatement = null;
+		String selectSQLString = "SELECT * FROM " + tableNameShoppers;
+		try {
+			// prep 
+			prepStatement = conn.prepareStatement(selectSQLString);
+			// execute
+			rs = prepStatement.executeQuery(selectSQLString);
+			// transfer to arraylist
+			while (rs.next()) {
+				String shopperUsername = rs.getString(columnNameShopperUsername);
+				String shopperEmail = rs.getString(columnNameShopperEmail);
+				String shopperID = rs.getString(columnNameShopperID);
+				arrayListOfShoppers.add(new MF_Shopper(shopperUsername, shopperEmail, shopperID));
+			}
+		}
+		catch (SQLException e) {
+			System.err.println("SQLException in MF_ShopperDAO getArrayListOfShoppers.");
+			e.printStackTrace();
+		}
+		finally {
+			if (prepStatement != null) {
+				try {
+					prepStatement.close();
+				}
+				catch (SQLException e) {
+					System.err.println(
+							"SQLException in MF_ShopperDAO getArrayListOfShoppers closing prepared statement.");
+					e.printStackTrace();
+				}
+			}
+			if (rs != null) {
+				try {
+					rs.close();
+				}
+				catch (SQLException e) {
+					System.err.println(
+							"SQLException in MF_ShopperDAO getArrayListOfShoppers closing result set.");
+					e.printStackTrace();
+				}
+			}
+		}
+		return arrayListOfShoppers;
 	}
-
 }

@@ -137,10 +137,10 @@ public class MF_DataAccessObject {
 		sql = "SELECT UPC FROM PRODUCTS";
 		sqlStatement = connection.createStatement();
 		rs = sqlStatement.executeQuery(sql);
-		
-		if (!rs.next()) {
-			throw new Exception();
-		}
+		// TODO this assumes PRODUCTS will always contain UPCs which it will not during testing
+//		if (!rs.next()) {
+//			throw new Exception();
+//		}
 		
 		while (rs.next()) {
 			String upc = rs.getString("UPC");

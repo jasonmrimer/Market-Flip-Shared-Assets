@@ -15,8 +15,10 @@ public class MF_PricePoint implements Comparable<MF_PricePoint> {
 
 	private final String	productTableID;
 	private final Double	price;
+	private String productUPC;
 
 	public MF_PricePoint(String productUPC, Double price) {
+		this.productUPC = productUPC;
 		this.productTableID = "UPC_" + productUPC;
 		this.price = price;
 	}
@@ -24,6 +26,11 @@ public class MF_PricePoint implements Comparable<MF_PricePoint> {
 	@Override
 	public int hashCode() {
 		return productTableID.hashCode() ^ price.hashCode();
+	}
+
+	public int compareTo(MF_PricePoint inPP) {
+		int lastCmp = productTableID.compareTo(inPP.productTableID);
+		return (lastCmp != 0 ? lastCmp : price.compareTo(inPP.price));
 	}
 
 	@Override
@@ -50,8 +57,7 @@ public class MF_PricePoint implements Comparable<MF_PricePoint> {
 		return toString;
 	}
 
-	public int compareTo(MF_PricePoint inPP) {
-		int lastCmp = productTableID.compareTo(inPP.productTableID);
-		return (lastCmp != 0 ? lastCmp : price.compareTo(inPP.price));
+	public String getProductUPC() {
+		return productUPC;
 	}
 }
