@@ -18,6 +18,8 @@ public class MF_NotificationsDAO {
 	private ArrayList<String>	arrayListOfTableNames;
 	private String tableNameNotifications;
 	private String columnNameShopperID;
+	private String columnNameShopperUsername;
+	private String columnNameShopperEmail;
 
 	public MF_NotificationsDAO() {
 		this.arrayListOfTableNames = new ArrayList<String>();

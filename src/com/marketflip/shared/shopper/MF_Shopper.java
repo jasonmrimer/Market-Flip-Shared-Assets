@@ -2,7 +2,7 @@ package com.marketflip.shared.shopper;
 
 import java.util.HashMap;
 import com.marketflip.shared.shopper.MF_PricePoint;
-import com.google.appengine.repackaged.org.apache.commons.codec.digest.DigestUtils;
+import org.apache.commons.codec.digest.DigestUtils;
 import com.marketflip.shared.products.MF_Product;
 
 /**
