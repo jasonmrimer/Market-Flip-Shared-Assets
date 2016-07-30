@@ -21,7 +21,7 @@ import com.google.appengine.repackaged.org.apache.commons.codec.digest.DigestUti
  * @author highball
  *
  */
-//test environment
+//test environment windows 1
 public class MF_ShopperDAO {
 
 	private ArrayList<String>	arrayListOfTableNames;
