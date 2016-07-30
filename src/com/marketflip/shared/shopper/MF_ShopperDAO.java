@@ -1,6 +1,5 @@
 package com.marketflip.shared.shopper;
 
-import java.lang.reflect.Constructor;
 import java.sql.Connection;
 import java.sql.DatabaseMetaData;
 import java.sql.DriverManager;
@@ -11,7 +10,7 @@ import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.HashMap;
 
-import com.google.appengine.repackaged.org.apache.commons.codec.digest.DigestUtils;
+import org.apache.commons.codec.digest.DigestUtils;
 
 /**
  * The Market Flip Application Shopper Database Access Object grants read/write access to the
@@ -68,7 +67,7 @@ public class MF_ShopperDAO {
 		if (shopperRecordExists(shopperEmail)) {
 			if (pricePointTableExists(shopperEmail)) {
 				// if exists, add record to price point table
-				String shopperID = DigestUtils.md5Hex(shopperEmail);
+				String shopperID = org.apache.commons.codec.digest.DigestUtils.md5Hex(shopperEmail);
 				String productTableID = "UPC_" + productUPC;
 				String tableNamePricePoint = tableNamePrefixPricePoint + shopperID;
 				// add shopper row to Shoppers table
