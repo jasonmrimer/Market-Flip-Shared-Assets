@@ -18,7 +18,17 @@ import java.util.Properties;
 
 import com.google.appengine.api.utils.SystemProperty;
 import com.google.appengine.repackaged.org.apache.commons.codec.digest.DigestUtils;
+import java.sql.Connection;
+import java.sql.DatabaseMetaData;
+import java.sql.DriverManager;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.sql.Statement;
+import java.util.ArrayList;
+import java.util.HashMap;
 
+import org.apache.commons.codec.digest.DigestUtils;
 /**
  * The Market Flip Application Shopper Database Access Object grants read/write access to the
  * Shopper Database that holds all informatino about shoppers such as usernames/email addresses and
@@ -89,6 +99,24 @@ public class MF_ShopperDAO {
 //					// page and use it to connect from an external network.
 //				}
 				this.conn = DriverManager.getConnection(url);
+			}
+			catch (SQLException e) {
+				e.printStackTrace();
+			}
+			catch (ClassNotFoundException e) {
+				e.printStackTrace();
+			}
+		}
+	}
+	public MF_ShopperDAO(boolean isMock) {
+		this();
+		if (!isMock) {
+			try {
+				Class.forName("com.mysql.jdbc.Driver");
+				this.conn = DriverManager.getConnection(hostURL, username, password);
+				this.arrayListOfTableNames = new ArrayList<String>();
+				//				clearAllTables();
+				//				createWebsitesTable();
 			}
 			catch (SQLException e) {
 				e.printStackTrace();
