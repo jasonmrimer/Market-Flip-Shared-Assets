@@ -50,7 +50,7 @@ public class MF_NotificationsDAO {
 	 * and the
 	 * unique identification hashed from the email address.
 	 */
-	public void createShoppersTable() {
+	public void createNotificationsTable() {
 		String sqlString = "CREATE TABLE " + tableNameNotifications + "(" + columnNameShopperID
 				+ " varchar(32)," + columnNameShopperUsername + " varchar(255),"
 				+ columnNameShopperEmail + " varchar(255));";

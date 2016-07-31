@@ -1,6 +1,10 @@
 package com.marketflip.shared.shopper;
 
 import java.lang.reflect.Constructor;
+import java.net.MalformedURLException;
+import java.net.URI;
+import java.net.URISyntaxException;
+import java.net.URL;
 import java.sql.Connection;
 import java.sql.DatabaseMetaData;
 import java.sql.DriverManager;
@@ -10,7 +14,9 @@ import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Properties;
 
+import com.google.appengine.api.utils.SystemProperty;
 import com.google.appengine.repackaged.org.apache.commons.codec.digest.DigestUtils;
 
 /**
@@ -30,12 +36,17 @@ public class MF_ShopperDAO {
 	private String				columnNameShopperID			= "ShopperID";
 	private String				columnNameShopperEmail		= "ShopperEmail";
 	private String				columnNameShopperUsername	= "ShopperUsername";
-	private String				hostURL						= "jdbc:mysql://173.194.249.229:3306/Shoppers?user=root";	//:3306/Shoppers?user=root
+	//	private String				hostURL						= "jdbc:mysql://2001:4860:4864:1:3384:d4f9:83c3:a882"; //:3306/Shoppers?user=root";	//:3306/Shoppers?user=root
+	//	private String				hostURL						= "jdbc:mysql://173.194.242.194:3306/shoppers?user=root";	//:3306/Shoppers?user=root sharedassets-database-v2
+	//	private String				hostURL						= "jdbc:mysql://(host=[2001-4860-4864-1-3384-d4f9-83c3-a882])(port=3306)"; //:3306/Shoppers?user=root";	//:3306/Shoppers?user=root
+	private String				hostURL						= "jdbc:mysql://";	//2001:4860:4864:1:3384:d4f9:83c3:a882"; //:3306/Shoppers?user=root";	//:3306/Shoppers?user=root
 	private boolean				isClosed;
 	private String				password					= ***REMOVED***;
+	//	private String				password					= "root";
 	private String				tableNameShoppers			= "Shoppers";
 	private String				tableNamePrefixPricePoint	= "PPT_";
 	private String				username					= "Jason";
+	//	private String				username					= "localhost";
 
 	public MF_ShopperDAO() {
 		this.arrayListOfTableNames = null;
@@ -48,10 +59,36 @@ public class MF_ShopperDAO {
 		if (!isMock) {
 			try {
 				Class.forName("com.mysql.jdbc.Driver");
-				this.conn = DriverManager.getConnection(hostURL, username, password);
+				Properties pro = new Properties();
+				pro.setProperty("2001:4860:4864:1:3384:d4f9:83c3:a882", "address");
+				pro.setProperty("3306", "port");
+				pro.setProperty("shoppers", "database");
+				//				this.conn = DriverManager.getConnection(hostURL);
 				this.arrayListOfTableNames = new ArrayList<String>();
 				//				clearAllTables();
 				//				createWebsitesTable();
+				/*
+				 * The following code block comes from GDC by clicking "Connect to SQL" in the SQL
+				 * area.
+				 */
+				String url = null;
+//				if (SystemProperty.environment
+//						.value() == SystemProperty.Environment.Value.Production) {
+					// Connecting from App Engine.
+					// Load the class that provides the "jdbc:google:mysql://"
+					// prefix.
+//					Class.forName("com.mysql.jdbc.GoogleDriver");
+//					url = "jdbc:google:mysql://marketflip-sharedassets:sharedassets-database?user=root";
+				 // Alternatively, connect to a Google Cloud SQL instance using:
+		        // jdbc:mysql://ip-address-of-google-cloud-sql-instance:3306/guestbook?user=root
+				url = "jdbc:mysql://[2001:4860:4864:1:3384:d4f9:83c3:a882]:3306/shoppers?user=root";
+
+//				}
+//				else {
+//					// You may also assign an IP Address from the access control
+//					// page and use it to connect from an external network.
+//				}
+				this.conn = DriverManager.getConnection(url);
 			}
 			catch (SQLException e) {
 				e.printStackTrace();

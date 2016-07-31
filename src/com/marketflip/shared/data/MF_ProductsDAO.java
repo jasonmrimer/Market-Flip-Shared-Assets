@@ -23,22 +23,32 @@ import com.marketflip.shared.products.util.MF_ProductValidator;
 
 public class MF_ProductsDAO extends MF_DataAccessObject {
 
-	private ArrayList<MF_Product> productsToCommit = new ArrayList<MF_Product>();
-	private	String				tableNameProducts = "PRODUCTS";
-	private String				columnNameUPC = "UPC";
-	private String				columnNameDeprecated = "DEPRECATED";
-	
+	private ArrayList<MF_Product>	productsToCommit		= new ArrayList<MF_Product>();
+	private String					tableNameProducts		= "PRODUCTS";
+	private String					columnNameUPC			= "UPC";
+	private String					columnNameDeprecated	= "DEPRECATED";
+	private boolean					reset;
+
 	public MF_ProductsDAO(String environment) {
 		super(environment, "Products");
-//		if (environment.equalsIgnoreCase("testing")) { // TODO put this in to use a blank slate; revised: made methods public to use when appropriate
-//			this.deleteAllTables();
-//			this.addProductsTable();
-//		}
+		//		if (environment.equalsIgnoreCase("testing")) { // TODO put this in to use a blank slate; revised: made methods public to use when appropriate
+		//			this.deleteAllTables();
+		//			this.addProductsTable();
+		//		}
+	}
+
+	public MF_ProductsDAO(String environment, boolean reset) {
+		this(environment);
+		this.reset = reset;
+		if (reset) {
+			this.deleteAllTables();
+			this.addProductsTable();
+		}
 	}
 
 	public void addProductsTable() {
-//		"INSERT INTO PRODUCTS.PRODUCTS " + " (UPC, DEPRECATED) "
-//				+ " VALUES ('" + upc + "', 0);";		
+		//		"INSERT INTO PRODUCTS.PRODUCTS " + " (UPC, DEPRECATED) "
+		//				+ " VALUES ('" + upc + "', 0);";		
 		String sqlString = "CREATE TABLE " + tableNameProducts + "(" + columnNameUPC
 				+ " varchar(32)," + columnNameDeprecated + " int);";
 		Statement sqlStatement = null;
@@ -183,7 +193,7 @@ public class MF_ProductsDAO extends MF_DataAccessObject {
 	 * @throws SQLException
 	 */
 	private boolean insertProduct(MF_Product product) throws SQLException {
-System.out.println("inside insertProduct");
+		System.out.println("inside insertProduct");
 		try {
 
 			String sql_create_info_table;
@@ -254,12 +264,12 @@ System.out.println("inside insertProduct");
 					+ " DESCRIPTION		varchar(300)	DEFAULT NULL,"
 					+ " URL				varchar(300)	DEFAULT NULL,"
 					+ " CURRENT_PRICE		varchar(45)		DEFAULT NULL);";
-//					+ " KEY UPC_FK_idx		(UPC)," + " KEY COMPANY_FK_idx	(COMPANY);"; // TODO re-do foreign keys cuz broken
-//					+ " CONSTRAINT COMPANY_FK_" + upc
-//					+ " FOREIGN KEY (COMPANY) REFERENCES COMPANIES"
-//					+ " (COMPANY_ID) ON DELETE NO ACTION ON UPDATE NO ACTION,"
-//					+ " CONSTRAINT UPC_FK_" + upc + " FOREIGN KEY (UPC) REFERENCES PRODUCTS(UPC)"
-//					+ " ON DELETE NO ACTION ON UPDATE NO ACTION ); ";
+			//					+ " KEY UPC_FK_idx		(UPC)," + " KEY COMPANY_FK_idx	(COMPANY);"; // TODO re-do foreign keys cuz broken
+			//					+ " CONSTRAINT COMPANY_FK_" + upc
+			//					+ " FOREIGN KEY (COMPANY) REFERENCES COMPANIES"
+			//					+ " (COMPANY_ID) ON DELETE NO ACTION ON UPDATE NO ACTION,"
+			//					+ " CONSTRAINT UPC_FK_" + upc + " FOREIGN KEY (UPC) REFERENCES PRODUCTS(UPC)"
+			//					+ " ON DELETE NO ACTION ON UPDATE NO ACTION ); ";
 
 			sql_create_price_table = "CREATE TABLE UPC_" + upc + "_PRICE ("
 					+ " DATE 						datetime 	NOT NULL DEFAULT CURRENT_TIMESTAMP,"
@@ -298,7 +308,8 @@ System.out.println("inside insertProduct");
 			insert_info_statement.setDouble(4, height);
 			insert_info_statement.setDouble(5, width);
 			insert_info_statement.setDouble(6, length);
-			description = (description.length() > 256) ? description.substring(0, 255) : description; // TODO review - need to trim long descriptions or find a way to keep more data
+			description = (description.length() > 256) ? description.substring(0, 255)
+					: description; // TODO review - need to trim long descriptions or find a way to keep more data
 			insert_info_statement.setString(7, description);
 			insert_info_statement.setString(8, linkToProduct.toExternalForm());
 			insert_info_statement.setDouble(9, lowestPrice);
