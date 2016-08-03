@@ -12,9 +12,9 @@ public class MF_DataAccessObject {
 	protected static final String PRODUCTION_IP 			= ***REMOVED***;
 	protected static final String TESTING_IP				= ***REMOVED***;
 	protected static final String PRODUCTION_URL 			= "jdbc:mysql://" + PRODUCTION_IP + ":3306/PRODUCTS";
-	protected static final String TESTING_URL 			= "jdbc:mysql://" + TESTING_IP + ":3306/PRODUCTS";
-	protected static final String USERNAME 				= ***REMOVED***;   //SHAME!! TODO: End the shame.
-	protected static final String PASSWORD				= ***REMOVED***;       //SHAME!! TODO: End the shame.
+	protected static final String TESTING_URL 				= "jdbc:mysql://" + TESTING_IP + ":3306/PRODUCTS";
+	protected static final String USERNAME 					= "Jason";   //SHAME!! TODO: End the shame.
+	protected static final String PASSWORD					= ***REMOVED***;       //SHAME!! TODO: End the shame.
 	
 	protected static final int 	
 		INFO_COMPANY_INDEX  		= 1,
@@ -41,7 +41,7 @@ public class MF_DataAccessObject {
 	 * @param childType - The child type, Insert or Get
 	 */
 	public MF_DataAccessObject (String environment, String childType) {
-		
+		System.out.println("testing changes");
 		if (!environment.equals("production") && (!environment.equals("testing"))){
 			System.err.println("ERROR: Invalid environment, using test mode by default.");
 			this.environment = "testing";

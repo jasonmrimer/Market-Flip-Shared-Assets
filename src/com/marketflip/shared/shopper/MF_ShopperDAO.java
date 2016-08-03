@@ -17,7 +17,6 @@ import java.util.HashMap;
 import java.util.Properties;
 
 import com.google.appengine.api.utils.SystemProperty;
-import com.google.appengine.repackaged.org.apache.commons.codec.digest.DigestUtils;
 import java.sql.Connection;
 import java.sql.DatabaseMetaData;
 import java.sql.DriverManager;
@@ -63,51 +62,53 @@ public class MF_ShopperDAO {
 		this.conn = null;
 		this.isClosed = false;
 	}
-
-	public MF_ShopperDAO(boolean isMock) {
-		this();
-		if (!isMock) {
-			try {
-				Class.forName("com.mysql.jdbc.Driver");
-				Properties pro = new Properties();
-				pro.setProperty("2001:4860:4864:1:3384:d4f9:83c3:a882", "address");
-				pro.setProperty("3306", "port");
-				pro.setProperty("shoppers", "database");
-				//				this.conn = DriverManager.getConnection(hostURL);
-				this.arrayListOfTableNames = new ArrayList<String>();
-				//				clearAllTables();
-				//				createWebsitesTable();
-				/*
-				 * The following code block comes from GDC by clicking "Connect to SQL" in the SQL
-				 * area.
-				 */
-				String url = null;
-//				if (SystemProperty.environment
-//						.value() == SystemProperty.Environment.Value.Production) {
-					// Connecting from App Engine.
-					// Load the class that provides the "jdbc:google:mysql://"
-					// prefix.
-//					Class.forName("com.mysql.jdbc.GoogleDriver");
-//					url = "jdbc:google:mysql://marketflip-sharedassets:sharedassets-database?user=root";
-				 // Alternatively, connect to a Google Cloud SQL instance using:
-		        // jdbc:mysql://ip-address-of-google-cloud-sql-instance:3306/guestbook?user=root
-				url = "jdbc:mysql://[2001:4860:4864:1:3384:d4f9:83c3:a882]:3306/shoppers?user=root";
-
-//				}
-//				else {
-//					// You may also assign an IP Address from the access control
-//					// page and use it to connect from an external network.
-//				}
-				this.conn = DriverManager.getConnection(url);
-			}
-			catch (SQLException e) {
-				e.printStackTrace();
-			}
-			catch (ClassNotFoundException e) {
-				e.printStackTrace();
-			}
-		}
-	}
+/*
+ * This is a draft block of code to connect to SQL using IPv6 instead of IPv4: never got it to work 20160803.
+ */
+//	public MF_ShopperDAO(boolean isMock) {
+//		this();
+//		if (!isMock) {
+//			try {
+//				Class.forName("com.mysql.jdbc.Driver");
+//				Properties pro = new Properties();
+//				pro.setProperty("2001:4860:4864:1:3384:d4f9:83c3:a882", "address");
+//				pro.setProperty("3306", "port");
+//				pro.setProperty("shoppers", "database");
+//				//				this.conn = DriverManager.getConnection(hostURL);
+//				this.arrayListOfTableNames = new ArrayList<String>();
+//				//				clearAllTables();
+//				//				createWebsitesTable();
+//				/*
+//				 * The following code block comes from GDC by clicking "Connect to SQL" in the SQL
+//				 * area.
+//				 */
+//				String url = null;
+////				if (SystemProperty.environment
+////						.value() == SystemProperty.Environment.Value.Production) {
+//					// Connecting from App Engine.
+//					// Load the class that provides the "jdbc:google:mysql://"
+//					// prefix.
+////					Class.forName("com.mysql.jdbc.GoogleDriver");
+////					url = "jdbc:google:mysql://marketflip-sharedassets:sharedassets-database?user=root";
+//				 // Alternatively, connect to a Google Cloud SQL instance using:
+//		        // jdbc:mysql://ip-address-of-google-cloud-sql-instance:3306/guestbook?user=root
+//				url = "jdbc:mysql://[2001:4860:4864:1:3384:d4f9:83c3:a882]:3306/shoppers?user=root";
+//
+////				}
+////				else {
+////					// You may also assign an IP Address from the access control
+////					// page and use it to connect from an external network.
+////				}
+//				this.conn = DriverManager.getConnection(url);
+//			}
+//			catch (SQLException e) {
+//				e.printStackTrace();
+//			}
+//			catch (ClassNotFoundException e) {
+//				e.printStackTrace();
+//			}
+//		}
+//	}
 	public MF_ShopperDAO(boolean isMock) {
 		this();
 		if (!isMock) {
