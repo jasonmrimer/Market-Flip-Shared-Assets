@@ -46,9 +46,9 @@ public class MF_ShopperDAO {
 	private String				columnNameShopperEmail		= "ShopperEmail";
 	private String				columnNameShopperUsername	= "ShopperUsername";
 	//	private String				hostURL						= "jdbc:mysql://2001:4860:4864:1:3384:d4f9:83c3:a882"; //:3306/Shoppers?user=root";	//:3306/Shoppers?user=root
-	//	private String				hostURL						= "jdbc:mysql://173.194.242.194:3306/shoppers?user=root";	//:3306/Shoppers?user=root sharedassets-database-v2
+	private String				hostURL						= "jdbc:mysql://173.194.80.142:3306/shoppers?user=root";	//:3306/Shoppers?user=root sharedassets-database-v2
 	//	private String				hostURL						= "jdbc:mysql://(host=[2001-4860-4864-1-3384-d4f9-83c3-a882])(port=3306)"; //:3306/Shoppers?user=root";	//:3306/Shoppers?user=root
-	private String				hostURL						= "jdbc:mysql://";	//2001:4860:4864:1:3384:d4f9:83c3:a882"; //:3306/Shoppers?user=root";	//:3306/Shoppers?user=root
+//	private String				hostURL						= "jdbc:mysql://";	//2001:4860:4864:1:3384:d4f9:83c3:a882"; //:3306/Shoppers?user=root";	//:3306/Shoppers?user=root
 	private boolean				isClosed;
 	private String				password					= ***REMOVED***;
 	//	private String				password					= "root";
