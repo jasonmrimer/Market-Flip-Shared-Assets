@@ -22,7 +22,7 @@ import com.marketflip.shared.products.MF_Product;
 import com.marketflip.shared.products.util.MF_ProductValidator;
 
 public class MF_ProductsDAO extends MF_DataAccessObject {
-
+	//testing the new setup
 	private ArrayList<MF_Product>	productsToCommit		= new ArrayList<MF_Product>();
 	private String					tableNameProducts		= "PRODUCTS";
 	private String					columnNameUPC			= "UPC";
