@@ -20,7 +20,7 @@ import java.util.Date;
 import com.marketflip.shared.products.MF_Price;
 import com.marketflip.shared.products.MF_Product;
 import com.marketflip.shared.products.util.MF_ProductValidator;
-
+// Here is a comment
 public class MF_ProductsDAO extends MF_DataAccessObject {
 
 	private ArrayList<MF_Product>	productsToCommit		= new ArrayList<MF_Product>();
