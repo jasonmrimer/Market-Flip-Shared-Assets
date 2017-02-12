@@ -15,7 +15,7 @@ import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Properties;
-
+import com.google.cloud.sql.mysql.SocketFactory;
 import com.google.appengine.api.utils.SystemProperty;
 import java.sql.Connection;
 import java.sql.DatabaseMetaData;
@@ -113,8 +113,52 @@ public class MF_ShopperDAO {
 		this();
 		if (!isMock) {
 			try {
+				// TODO 20170210 attempting use of SocketFactory to see if connection able without IPv4
+				
+				// from https://github.com/GoogleCloudPlatform/cloud-sql-mysql-socket-factory/blob/master/examples/compute-engine/src/main/java/com/google/cloud/sql/mysql/example/ListTables.java
+				// via https://cloud.google.com/sql/docs/external#java
+			    // TODO: fill this in
+			    // The instance connection name can be obtained from the instance overview page in Cloud Console
+			    // or by running "gcloud sql instances describe <instance> | grep connectionName".
+			    String instanceConnectionName = "marketflip-sharedassets:us-central1:sharedassets-database2";
+
+			    // TODO: fill this in
+			    // The database from which to list tables.
+			    String databaseName = "sharedassets";
+
+//			    String username = "root";
+
+			    // TODO: fill this in
+			    // This is the password that was set via the Cloud Console or empty if never set
+			    // (not recommended).
+//			    String password = "<insert_password>";
+
+			    if (instanceConnectionName.equals("<insert_connection_name>")) {
+			      System.err.println("Please update the sample to specify the instance connection name.");
+			      System.exit(1);
+			    }
+
+			    if (password.equals("<insert_password>")) {
+			      System.err.println("Please update the sample to specify the mysql password.");
+			      System.exit(1);
+			    }
+
+			    //[START doc-example]
+			    String jdbcUrl = String.format(
+			        "jdbc:mysql://google/%s?cloudSqlInstance=%s&"
+			            + "socketFactory=com.google.cloud.sql.mysql.SocketFactory",
+			        databaseName,
+			        instanceConnectionName);
+				
+				
+				
+				
+				
+				
+				
 				Class.forName("com.mysql.jdbc.Driver");
-				this.conn = DriverManager.getConnection(hostURL, username, password);
+//				this.conn = DriverManager.getConnection(hostURL, username, password);
+				this.conn = DriverManager.getConnection(jdbcUrl, username, password);
 				this.arrayListOfTableNames = new ArrayList<String>();
 				//				clearAllTables();
 				//				createWebsitesTable();
