@@ -9,12 +9,12 @@ import java.util.HashSet;
 
 public class MF_DataAccessObject {
 	
-	protected static final String PRODUCTION_IP 			= ***REMOVED***; // This value will change each time we rset the database in the GDC. 173.194.236.246"; // 173.194.80.142
-	protected static final String TESTING_IP				= ***REMOVED***;
+	protected static final String PRODUCTION_IP 			= "***REMOVED***"; // This value will change each time we rset the database in the GDC. 173.194.236.246"; // 173.194.80.142
+	protected static final String TESTING_IP				= "***REMOVED***";
 	protected static final String PRODUCTION_URL 			= "jdbc:mysql://" + PRODUCTION_IP + ":3306/PRODUCTS";
 	protected static final String TESTING_URL 				= "jdbc:mysql://" + TESTING_IP + ":3306/PRODUCTS";
-	protected static final String USERNAME 					= ***REMOVED***;   //SHAME!! TODO: End the shame.
-	protected static final String PASSWORD					= ***REMOVED***;       //SHAME!! TODO: End the shame.
+	protected static final String USERNAME 					= "***REMOVED***";   //SHAME!! TODO: End the shame.
+	protected static final String PASSWORD					= "***REMOVED***";       //SHAME!! TODO: End the shame.
 	
 	protected static final int 	
 		INFO_COMPANY_INDEX  		= 1,

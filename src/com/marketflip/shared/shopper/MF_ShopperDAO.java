@@ -33,7 +33,7 @@ public class MF_ShopperDAO {
 	//	private String				hostURL						= "jdbc:mysql://(host=[2001-4860-4864-1-3384-d4f9-83c3-a882])(port=3306)"; //:3306/Shoppers?user=root";	//:3306/Shoppers?user=root
 //	private String				hostURL						= "jdbc:mysql://";	//2001:4860:4864:1:3384:d4f9:83c3:a882"; //:3306/Shoppers?user=root";	//:3306/Shoppers?user=root
 	private boolean				isClosed;
-	private String				password					= ***REMOVED***;
+	private String				password					= "marketflip";
 	//	private String				password					= "root";
 	private String				tableNameShoppers			= "Shoppers";
 	private String				tableNamePrefixPricePoint	= "PPT_";

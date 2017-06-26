@@ -14,7 +14,7 @@ public class MF_NotificationsDAO {
 	private boolean				isClosed;
 	private String				hostURL		= "jdbc:mysql://173.194.242.194:3306/notifications?user=root";	//:3306/Shoppers?user=root
 	private String				username	= "Jason";
-	private String				password	= ***REMOVED***;
+	private String				password	= "marketflip";
 	private ArrayList<String>	arrayListOfTableNames;
 	private String tableNameNotifications;
 	private String columnNameShopperID;
